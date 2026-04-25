@@ -1,3 +1,4 @@
+import { requestRecordingPermissionsAsync } from "expo-audio";
 import { Linking, PermissionsAndroid, Platform } from "react-native";
 
 type PermissionResult = {
@@ -27,36 +28,16 @@ function normalizeExpoResponse(response: ExpoPermissionResponse): PermissionResu
   };
 }
 
-function optionalRequire(moduleName: string): unknown | null {
+async function requestViaExpoModules(): Promise<PermissionResult | null> {
   try {
-    const dynamicRequire = Function("moduleName", "return require(moduleName);") as (
-      target: string,
-    ) => unknown;
+    return normalizeExpoResponse(await requestRecordingPermissionsAsync());
+  } catch (error) {
+    if (Platform.OS !== "android") {
+      throw error;
+    }
 
-    return dynamicRequire(moduleName);
-  } catch {
     return null;
   }
-}
-
-async function requestViaExpoModules(): Promise<PermissionResult | null> {
-  const expoAudio = optionalRequire("expo-audio") as
-    | { requestRecordingPermissionsAsync?: () => Promise<ExpoPermissionResponse> }
-    | null;
-
-  if (expoAudio?.requestRecordingPermissionsAsync) {
-    return normalizeExpoResponse(await expoAudio.requestRecordingPermissionsAsync());
-  }
-
-  const expoAv = optionalRequire("expo-av") as
-    | { Audio?: { requestPermissionsAsync?: () => Promise<ExpoPermissionResponse> } }
-    | null;
-
-  if (expoAv?.Audio?.requestPermissionsAsync) {
-    return normalizeExpoResponse(await expoAv.Audio.requestPermissionsAsync());
-  }
-
-  return null;
 }
 
 export async function requestMicrophonePermission(): Promise<PermissionResult> {

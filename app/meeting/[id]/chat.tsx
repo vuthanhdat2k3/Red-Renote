@@ -3,6 +3,7 @@ import { SendHorizonal } from "lucide-react-native";
 import { Text, View } from "react-native";
 
 import { MeetingDetailNav } from "@/components/meeting/MeetingDetailNav";
+import { MeetingHomeAction } from "@/components/meeting/MeetingHomeAction";
 import { AppHeader } from "@/components/shell/AppHeader";
 import { AIChip } from "@/components/ui/AIChip";
 import { AppButton } from "@/components/ui/Button";
@@ -17,7 +18,13 @@ export default function MeetingChatRoute() {
 
   return (
     <AppScreen contentClassName="gap-5">
-      <AppHeader showBackButton onBackPress={() => router.back()} title="AI Chat" subtitle={meetingId} />
+      <AppHeader
+        showBackButton
+        onBackPress={() => router.back()}
+        rightAction={<MeetingHomeAction />}
+        title="AI Chat"
+        subtitle={meetingId}
+      />
       <MeetingDetailNav activeTab="chat" meetingId={meetingId} />
       <View className="flex-row flex-wrap gap-2">
         <AIChip active label="What changed?" />

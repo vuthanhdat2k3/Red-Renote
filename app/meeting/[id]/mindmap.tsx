@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { Text, View } from "react-native";
 
 import { MeetingDetailNav } from "@/components/meeting/MeetingDetailNav";
+import { MeetingHomeAction } from "@/components/meeting/MeetingHomeAction";
 import { AppHeader } from "@/components/shell/AppHeader";
 import { AppCard } from "@/components/ui/Card";
 import { AppScreen } from "@/components/ui/AppScreen";
@@ -26,7 +27,13 @@ export default function MeetingMindmapRoute() {
 
   return (
     <AppScreen contentClassName="gap-5">
-      <AppHeader showBackButton onBackPress={() => router.back()} title="Mindmap" subtitle={meetingId} />
+      <AppHeader
+        showBackButton
+        onBackPress={() => router.back()}
+        rightAction={<MeetingHomeAction />}
+        title="Mindmap"
+        subtitle={meetingId}
+      />
       <MeetingDetailNav activeTab="mindmap" meetingId={meetingId} />
       <AppCard className="gap-3 py-5">
         {renderNode(meeting.mindmap)}

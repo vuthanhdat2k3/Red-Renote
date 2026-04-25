@@ -24,7 +24,13 @@
       "output": "static"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow Red Renote to access your microphone so it can record meetings."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

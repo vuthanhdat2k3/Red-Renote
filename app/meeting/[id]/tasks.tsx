@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from "expo-router";
 
 import { MeetingDetailNav } from "@/components/meeting/MeetingDetailNav";
+import { MeetingHomeAction } from "@/components/meeting/MeetingHomeAction";
 import { TaskCard } from "@/components/meeting/TaskCard";
 import { AppHeader } from "@/components/shell/AppHeader";
 import { AppScreen } from "@/components/ui/AppScreen";
@@ -14,7 +15,13 @@ export default function MeetingTasksRoute() {
 
   return (
     <AppScreen contentClassName="gap-5">
-      <AppHeader showBackButton onBackPress={() => router.back()} title="Meeting Tasks" subtitle={meetingId} />
+      <AppHeader
+        showBackButton
+        onBackPress={() => router.back()}
+        rightAction={<MeetingHomeAction />}
+        title="Meeting Tasks"
+        subtitle={meetingId}
+      />
       <MeetingDetailNav activeTab="tasks" meetingId={meetingId} />
       <SectionTitle title="AI action items" subtitle="Owners, deadlines, and source timestamps from meeting data." />
       {tasks.map((task) => (

@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useDeferredValue, useState } from "react";
 
 import { MeetingDetailNav } from "@/components/meeting/MeetingDetailNav";
+import { MeetingHomeAction } from "@/components/meeting/MeetingHomeAction";
 import { TranscriptBlock } from "@/components/meeting/TranscriptBlock";
 import { AppHeader } from "@/components/shell/AppHeader";
 import { AppScreen } from "@/components/ui/AppScreen";
@@ -26,7 +27,13 @@ export default function MeetingTranscriptRoute() {
 
   return (
     <AppScreen contentClassName="gap-5">
-      <AppHeader showBackButton onBackPress={() => router.back()} title="Transcript" subtitle={meetingId} />
+      <AppHeader
+        showBackButton
+        onBackPress={() => router.back()}
+        rightAction={<MeetingHomeAction />}
+        title="Transcript"
+        subtitle={meetingId}
+      />
       <MeetingDetailNav activeTab="transcript" meetingId={meetingId} />
       <SearchBar onChangeText={setQuery} placeholder="Search transcript" value={query} />
       {visibleSegments.map((segment) => (

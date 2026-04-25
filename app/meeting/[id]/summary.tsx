@@ -3,6 +3,7 @@ import { MessageCircle } from "lucide-react-native";
 import { Text, View } from "react-native";
 
 import { MeetingDetailNav } from "@/components/meeting/MeetingDetailNav";
+import { MeetingHomeAction } from "@/components/meeting/MeetingHomeAction";
 import { AppHeader } from "@/components/shell/AppHeader";
 import { AIChip } from "@/components/ui/AIChip";
 import { AppButton } from "@/components/ui/Button";
@@ -18,7 +19,13 @@ export default function MeetingSummaryRoute() {
 
   return (
     <AppScreen contentClassName="gap-6">
-      <AppHeader showBackButton onBackPress={() => router.replace("/(tabs)/home")} title="Meeting Summary" subtitle={meetingId} />
+      <AppHeader
+        showBackButton
+        onBackPress={() => router.replace("/(tabs)/home")}
+        rightAction={<MeetingHomeAction />}
+        title="Meeting Summary"
+        subtitle={meetingId}
+      />
       <MeetingDetailNav activeTab="summary" meetingId={meetingId} />
       <AppCard className="gap-4" padding="lg">
         <View className="flex-row flex-wrap gap-2">
