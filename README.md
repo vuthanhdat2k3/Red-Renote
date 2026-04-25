@@ -11,6 +11,7 @@ Expo React Native shell for an iOS-first AI meeting assistant.
 - NativeWind
 - Zustand
 - React Hook Form
+- Supabase
 - Lucide React Native icons
 - React Native Safe Area Context
 
@@ -30,9 +31,12 @@ src/
     ui/                      Base primitives
   constants/                 Design tokens and route metadata
   data/                      Mock shell data
+  hooks/                     Data-loading hooks
   lib/                       Shared utilities
   store/                     Zustand stores
   types/                     Domain types
+supabase/
+  migrations/                Database schema and seed data
 ```
 
 ## Design Direction
@@ -46,3 +50,14 @@ npm install
 npm run start
 npm run typecheck
 ```
+
+## Supabase
+
+Create a Supabase project, then copy `.env.example` to `.env.local` and fill in:
+
+```bash
+EXPO_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+Apply the schema and seed data from `supabase/migrations/202604250001_initial_schema.sql` in the Supabase SQL editor or with the Supabase CLI. The app reads from Supabase when both env values are present and falls back to local mock data during development.

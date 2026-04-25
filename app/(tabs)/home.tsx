@@ -13,7 +13,7 @@ import { AppCard } from "@/components/ui/Card";
 import { AppScreen } from "@/components/ui/AppScreen";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { colors, radius } from "@/constants/tokens";
-import { currentUser, fullMeeting, meetings, tasks } from "@/data/mock";
+import { useDashboardData } from "@/hooks/useMeetingData";
 import { useAppStore } from "@/store/app-store";
 import type { Meeting } from "@/types/meeting";
 
@@ -67,7 +67,7 @@ function buildProjectFolders(sourceMeetings: Meeting[]) {
   }));
 }
 
-function getTaskSummary() {
+function getTaskSummary(tasks: ReturnType<typeof useDashboardData>["tasks"]) {
   const pending = tasks.filter((task) => task.status !== "done").length;
   const inProgress = tasks.filter((task) => task.status === "in_progress").length;
 
@@ -77,13 +77,14 @@ function getTaskSummary() {
 export default function HomeRoute() {
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
+  const { currentUser, meetings, tasks, featuredMeeting } = useDashboardData();
   const startRecording = useAppStore((state) => state.startRecording);
 
   const visibleMeetings = meetings.filter((meeting) => matchesMeeting(meeting, deferredQuery));
   const actionItems = tasks.filter((task) => task.status !== "done").slice(0, 4);
-  const suggestedFollowUps = fullMeeting.followUps.slice(0, 4);
+  const suggestedFollowUps = featuredMeeting.followUps.slice(0, 4);
   const projectFolders = buildProjectFolders(meetings);
-  const taskSummary = getTaskSummary();
+  const taskSummary = getTaskSummary(tasks);
 
   const handleStartRecording = () => {
     startRecording(`rec-${Date.now()}`);
@@ -241,10 +242,10 @@ export default function HomeRoute() {
           <View className="flex-row flex-wrap gap-y-2">
             {suggestedFollowUps.map((followUp) => (
               <FollowUpPill
-                key={followUp}
-                label={followUp}
-                onPress={() => {
-                  router.push({ pathname: "/meeting/[id]/tasks", params: { id: fullMeeting.id } });
+                  key={followUp}
+                  label={followUp}
+                  onPress={() => {
+                  router.push({ pathname: "/meeting/[id]/tasks", params: { id: featuredMeeting.id } });
                 }}
               />
             ))}

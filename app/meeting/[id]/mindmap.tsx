@@ -5,7 +5,7 @@ import { MeetingDetailNav } from "@/components/meeting/MeetingDetailNav";
 import { AppHeader } from "@/components/shell/AppHeader";
 import { AppCard } from "@/components/ui/Card";
 import { AppScreen } from "@/components/ui/AppScreen";
-import { mindmap } from "@/data/mock";
+import { useMeeting } from "@/hooks/useMeetingData";
 import type { MindmapNode } from "@/types/meeting";
 
 function renderNode(node: MindmapNode, level = 0) {
@@ -22,13 +22,14 @@ function renderNode(node: MindmapNode, level = 0) {
 export default function MeetingMindmapRoute() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const meetingId = id ?? "meeting-demo";
+  const meeting = useMeeting(meetingId);
 
   return (
     <AppScreen contentClassName="gap-5">
       <AppHeader showBackButton onBackPress={() => router.back()} title="Mindmap" subtitle={meetingId} />
       <MeetingDetailNav activeTab="mindmap" meetingId={meetingId} />
       <AppCard className="gap-3 py-5">
-        {renderNode(mindmap)}
+        {renderNode(meeting.mindmap)}
       </AppCard>
     </AppScreen>
   );

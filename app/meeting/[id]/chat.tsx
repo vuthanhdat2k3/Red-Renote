@@ -8,11 +8,12 @@ import { AIChip } from "@/components/ui/AIChip";
 import { AppButton } from "@/components/ui/Button";
 import { AppCard } from "@/components/ui/Card";
 import { AppScreen } from "@/components/ui/AppScreen";
-import { aiMessages } from "@/data/mock";
+import { useAIChatMessages } from "@/hooks/useMeetingData";
 
 export default function MeetingChatRoute() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const meetingId = id ?? "meeting-demo";
+  const aiMessages = useAIChatMessages(meetingId);
 
   return (
     <AppScreen contentClassName="gap-5">
@@ -32,7 +33,7 @@ export default function MeetingChatRoute() {
           ) : null}
         </AppCard>
       ))}
-      <AppButton icon={SendHorizonal}>Send mock question</AppButton>
+      <AppButton icon={SendHorizonal}>Send question</AppButton>
     </AppScreen>
   );
 }
