@@ -11,7 +11,7 @@ export type BottomTabBarProps = {
     routes: { key: string; name: string }[];
   };
   navigation: {
-    emit: (options: { type: "tabPress"; target?: string; canPreventDefault: boolean }) => { defaultPrevented: boolean };
+    emit: (options: { type: "tabPress"; target?: string; canPreventDefault: true }) => { defaultPrevented: boolean };
     navigate: (name: string) => void;
   };
 };
