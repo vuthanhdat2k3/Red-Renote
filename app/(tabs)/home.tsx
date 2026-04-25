@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { Bell, Mic, Search } from "lucide-react-native";
+import { Bell, CalendarDays, Mic, Search, Sparkles } from "lucide-react-native";
 import { useDeferredValue, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 
@@ -33,6 +33,14 @@ function getGreeting() {
   return "Good evening";
 }
 
+function getTodayLabel() {
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+  }).format(new Date());
+}
+
 function matchesMeeting(meeting: Meeting, query: string) {
   const normalizedQuery = query.trim().toLowerCase();
 
@@ -40,13 +48,9 @@ function matchesMeeting(meeting: Meeting, query: string) {
     return true;
   }
 
-  return [
-    meeting.title,
-    meeting.project,
-    meeting.summary,
-    meeting.date,
-    ...meeting.tags,
-  ].some((value) => value.toLowerCase().includes(normalizedQuery));
+  return [meeting.title, meeting.project, meeting.summary, meeting.date, ...meeting.tags].some((value) =>
+    value.toLowerCase().includes(normalizedQuery),
+  );
 }
 
 function buildProjectFolders(sourceMeetings: Meeting[]) {
@@ -63,15 +67,23 @@ function buildProjectFolders(sourceMeetings: Meeting[]) {
   }));
 }
 
+function getTaskSummary() {
+  const pending = tasks.filter((task) => task.status !== "done").length;
+  const inProgress = tasks.filter((task) => task.status === "in_progress").length;
+
+  return { pending, inProgress };
+}
+
 export default function HomeRoute() {
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const startRecording = useAppStore((state) => state.startRecording);
 
   const visibleMeetings = meetings.filter((meeting) => matchesMeeting(meeting, deferredQuery));
-  const actionItems = tasks.filter((task) => task.status !== "done").slice(0, 3);
+  const actionItems = tasks.filter((task) => task.status !== "done").slice(0, 4);
   const suggestedFollowUps = fullMeeting.followUps.slice(0, 4);
   const projectFolders = buildProjectFolders(meetings);
+  const taskSummary = getTaskSummary();
 
   const handleStartRecording = () => {
     startRecording(`rec-${Date.now()}`);
@@ -80,73 +92,105 @@ export default function HomeRoute() {
 
   return (
     <AppScreen contentClassName="gap-6 pb-8 pt-2">
-      <View className="flex-row items-center justify-between">
-        <View className="flex-row items-center gap-3">
-          <View
-            className="h-9 w-9 items-center justify-center"
-            style={{ borderRadius: 18, backgroundColor: colors.text }}
-          >
-            <Mic color={colors.surface} size={16} strokeWidth={2.6} />
+      <View className="flex-row items-start justify-between gap-4">
+        <View className="flex-1 gap-2">
+          <View className="flex-row items-center gap-2">
+            <View
+              className="h-10 w-10 items-center justify-center"
+              style={{ borderRadius: 20, backgroundColor: colors.text }}
+            >
+              <Mic color={colors.surface} size={16} strokeWidth={2.6} />
+            </View>
+            <View
+              className="rounded-full px-3 py-1.5"
+              style={{ backgroundColor: "#FFF1F0" }}
+            >
+              <Text className="text-[11px] font-semibold uppercase tracking-[0.8px]" style={{ color: "#8C151B" }}>
+                Home Dashboard
+              </Text>
+            </View>
           </View>
-          <View className="gap-0.5">
-            <Text className="text-[13px] font-semibold" style={{ color: colors.text }}>
-              {getGreeting()}
+
+          <View className="gap-1">
+            <Text className="text-[28px] font-bold leading-8" style={{ color: colors.text }}>
+              {getGreeting()}, {currentUser.name.split(" ")[0]}
             </Text>
-            <Text className="text-[12px]" style={{ color: colors.secondaryText }}>
-              {currentUser.name}
+            <Text className="text-[14px] leading-6" style={{ color: colors.secondaryText }}>
+              Keep today&apos;s meetings, tasks, and AI follow-ups in one place.
             </Text>
           </View>
         </View>
 
-        <View
-          className="h-9 w-9 items-center justify-center bg-white"
-          style={{ borderRadius: 18 }}
-        >
-          <Bell color={colors.primary} size={17} strokeWidth={2.4} />
+        <View className="items-end gap-3">
+          <View
+            className="h-10 w-10 items-center justify-center bg-white"
+            style={{ borderRadius: 20, borderWidth: 1, borderColor: colors.border }}
+          >
+            <Bell color={colors.primary} size={17} strokeWidth={2.4} />
+          </View>
+          <View className="rounded-[18px] bg-white px-3 py-2" style={{ borderWidth: 1, borderColor: colors.border }}>
+            <View className="flex-row items-center gap-2">
+              <CalendarDays color={colors.secondaryText} size={14} strokeWidth={2.4} />
+              <Text className="text-[11px] font-semibold" style={{ color: colors.secondaryText }}>
+                {getTodayLabel()}
+              </Text>
+            </View>
+          </View>
         </View>
       </View>
 
       <SearchBar
-        className="h-11 rounded-2xl bg-white"
+        className="h-12 rounded-[20px] border-[#E7E5E4] bg-white"
         onChangeText={setQuery}
-        placeholder="Search meetings, tasks, or ask AI..."
+        placeholder="Search mock meetings by title, project, tag, or date"
         value={query}
       />
 
-      <StartRecordingCard onPress={handleStartRecording} />
-
-      <AppCard className="gap-2" padding="md">
-        <View className="flex-row items-center justify-between">
+      <View className="flex-row gap-3">
+        <AppCard className="flex-1 gap-3 border-[#F4D4D7] bg-[#FFF7F6]" padding="md">
           <View className="flex-row items-center gap-2">
             <View
-              className="h-7 w-7 items-center justify-center bg-[#FFF1F0]"
-              style={{ borderRadius: radius.sm }}
+              className="h-8 w-8 items-center justify-center"
+              style={{ borderRadius: radius.md, backgroundColor: "#FFF1F0" }}
             >
-              <Search color={colors.primary} size={14} strokeWidth={2.5} />
+              <Search color={colors.primary} size={15} strokeWidth={2.5} />
             </View>
-            <Text className="text-[16px] font-bold" style={{ color: colors.text }}>
-              {"Today's Actions"}
+            <Text className="text-[12px] font-semibold uppercase tracking-[0.8px]" style={{ color: "#8C151B" }}>
+              Meetings found
             </Text>
           </View>
-          <View className="rounded-full bg-[#FFF1F0] px-3 py-1">
-            <Text className="text-[11px] font-semibold" style={{ color: colors.primary }}>
-              {actionItems.length} Pending
+          <Text className="text-[24px] font-bold" style={{ color: colors.text }}>
+            {visibleMeetings.length}
+          </Text>
+          <Text className="text-[13px] leading-5" style={{ color: colors.secondaryText }}>
+            {query.trim().length > 0 ? "Filtered locally from mock meeting data." : "All recent mock meetings are visible."}
+          </Text>
+        </AppCard>
+
+        <AppCard className="flex-1 gap-3" padding="md">
+          <View className="flex-row items-center gap-2">
+            <View
+              className="h-8 w-8 items-center justify-center"
+              style={{ borderRadius: radius.md, backgroundColor: "#F4F4F5" }}
+            >
+              <Sparkles color={colors.text} size={15} strokeWidth={2.4} />
+            </View>
+            <Text className="text-[12px] font-semibold uppercase tracking-[0.8px]" style={{ color: colors.secondaryText }}>
+              Today&apos;s load
             </Text>
           </View>
-        </View>
+          <Text className="text-[24px] font-bold" style={{ color: colors.text }}>
+            {taskSummary.pending}
+          </Text>
+          <Text className="text-[13px] leading-5" style={{ color: colors.secondaryText }}>
+            {taskSummary.inProgress} already moving, the rest still need attention.
+          </Text>
+        </AppCard>
+      </View>
 
-        {actionItems.map((task) => (
-          <DashboardTaskRow
-            key={task.id}
-            task={task}
-            onPress={() => {
-              router.push({ pathname: "/meeting/[id]/tasks", params: { id: task.meetingId } });
-            }}
-          />
-        ))}
-      </AppCard>
+      <StartRecordingCard onPress={handleStartRecording} />
 
-      <HomeSection action="View All" title="Recent Meetings">
+      <HomeSection action={`${visibleMeetings.length} shown`} title="Recent Meetings">
         {visibleMeetings.length > 0 ? (
           <ScrollView
             horizontal
@@ -164,33 +208,49 @@ export default function HomeRoute() {
             ))}
           </ScrollView>
         ) : (
-          <View className="rounded-2xl bg-white p-5">
-            <Text className="text-[14px] font-semibold" style={{ color: colors.text }}>
-              No meetings found
+          <AppCard className="gap-2" padding="lg">
+            <Text className="text-[15px] font-bold" style={{ color: colors.text }}>
+              No mock meetings match this search
             </Text>
-            <Text className="mt-1 text-[13px] leading-5" style={{ color: colors.secondaryText }}>
-              Try another title, project, tag, or date.
+            <Text className="text-[13px] leading-5" style={{ color: colors.secondaryText }}>
+              Try another title, date, project name, or tag. The filter only affects the local mock meeting list.
             </Text>
-          </View>
+          </AppCard>
         )}
       </HomeSection>
 
-      <AppCard className="gap-4" padding="md">
-        <Text className="text-[16px] font-bold" style={{ color: colors.text }}>
-          AI Suggested Follow-ups
-        </Text>
-        <View className="flex-row flex-wrap gap-y-2">
-          {suggestedFollowUps.map((followUp) => (
-            <FollowUpPill
-              key={followUp}
-              label={followUp}
+      <HomeSection action={`${actionItems.length} pending`} title="Today&apos;s Action Items">
+        <AppCard className="gap-3 bg-[#FCFCFC]" padding="sm">
+          {actionItems.map((task) => (
+            <DashboardTaskRow
+              key={task.id}
+              task={task}
               onPress={() => {
-                router.push({ pathname: "/meeting/[id]/tasks", params: { id: fullMeeting.id } });
+                router.push({ pathname: "/meeting/[id]/tasks", params: { id: task.meetingId } });
               }}
             />
           ))}
-        </View>
-      </AppCard>
+        </AppCard>
+      </HomeSection>
+
+      <HomeSection action="AI assisted" title="Suggested Follow-ups">
+        <AppCard className="gap-4" padding="md">
+          <Text className="text-[14px] leading-6" style={{ color: colors.secondaryText }}>
+            Suggested next steps pulled from the latest meeting summary and ready for task review.
+          </Text>
+          <View className="flex-row flex-wrap gap-y-2">
+            {suggestedFollowUps.map((followUp) => (
+              <FollowUpPill
+                key={followUp}
+                label={followUp}
+                onPress={() => {
+                  router.push({ pathname: "/meeting/[id]/tasks", params: { id: fullMeeting.id } });
+                }}
+              />
+            ))}
+          </View>
+        </AppCard>
+      </HomeSection>
 
       <HomeSection title="Project Folders">
         <View className="flex-row gap-3">
