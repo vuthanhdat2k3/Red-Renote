@@ -1,44 +1,54 @@
 import { router } from "expo-router";
-import { ArrowRight, Sparkles } from "lucide-react-native";
+import { ArrowRight } from "lucide-react-native";
 import { Text, View } from "react-native";
 
-import { AppButton } from "@/components/ui/Button";
+import { BrandMark } from "@/components/launch/BrandMark";
+import { EntryPrimaryButton } from "@/components/launch/EntryPrimaryButton";
+import { OnboardingArtwork } from "@/components/launch/OnboardingArtwork";
 import { AppScreen } from "@/components/ui/AppScreen";
-import { AIChip } from "@/components/ui/AIChip";
-import { colors } from "@/constants/tokens";
+import { colors, spacing } from "@/constants/tokens";
 import { useAppStore } from "@/store/app-store";
 
 export default function OnboardingRoute() {
   const completeOnboarding = useAppStore((state) => state.completeOnboarding);
 
   return (
-    <AppScreen scroll={false} contentClassName="justify-between py-8">
-      <View className="gap-8 pt-8">
-        <View className="h-16 w-16 items-center justify-center rounded-3xl bg-red-50">
-          <Sparkles color={colors.primary} size={30} strokeWidth={2.5} />
+    <AppScreen scroll={false} contentClassName="justify-between pb-10 pt-5">
+      <View className="items-center gap-8">
+        <BrandMark compact />
+        <View className="w-full px-3">
+          <OnboardingArtwork />
         </View>
-        <View className="gap-4">
-          <Text className="text-[34px] font-bold leading-[40px] text-app-text">Turn meetings into decisions.</Text>
-          <Text className="text-base leading-6 text-app-muted">
-            Record conversations, generate summaries, extract tasks, and keep every decision searchable.
+        <View className="gap-4 px-2">
+          <Text
+            className="text-center text-[26px] font-bold leading-[36px] tracking-[-0.6px]"
+            style={{ color: colors.text }}
+          >
+            Turn every meeting into{"\n"}notes, summaries, tasks,{"\n"}and answers.
+          </Text>
+          <Text
+            className="text-center text-[15px] leading-6"
+            style={{ color: colors.secondaryText }}
+          >
+            Capture conversations once, then let Red Renote organize the follow-up for you.
           </Text>
         </View>
-        <View className="flex-row flex-wrap gap-2">
-          <AIChip active label="Summaries" />
-          <AIChip label="Tasks" />
-          <AIChip label="Transcript search" />
-        </View>
       </View>
-      <AppButton
-        icon={ArrowRight}
-        rightIcon={ArrowRight}
-        onPress={() => {
-          completeOnboarding();
-          router.replace("/microphone-permission");
-        }}
-      >
-        Continue
-      </AppButton>
+
+      <View className="gap-5" style={{ marginBottom: spacing.md }}>
+        <EntryPrimaryButton
+          icon={ArrowRight}
+          onPress={() => {
+            completeOnboarding();
+            router.replace("/microphone-permission");
+          }}
+        >
+          Get Started
+        </EntryPrimaryButton>
+        <Text className="text-center text-[13px]" style={{ color: colors.primary }}>
+          I already have an account
+        </Text>
+      </View>
     </AppScreen>
   );
 }

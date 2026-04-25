@@ -1,10 +1,9 @@
 import { router } from "expo-router";
-import { Mic } from "lucide-react-native";
 import { useEffect } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
+import { BrandMark } from "@/components/launch/BrandMark";
 import { AppScreen } from "@/components/ui/AppScreen";
-import { colors } from "@/constants/tokens";
 import { useAppStore } from "@/store/app-store";
 
 export default function SplashRoute() {
@@ -14,19 +13,22 @@ export default function SplashRoute() {
     const timer = setTimeout(() => {
       markSplashSeen();
       router.replace("/onboarding");
-    }, 900);
+    }, 1200);
 
     return () => clearTimeout(timer);
   }, [markSplashSeen]);
 
   return (
-    <AppScreen scroll={false} contentClassName="items-center justify-center gap-5">
-      <View className="h-20 w-20 items-center justify-center rounded-[28px] bg-brand-primary">
-        <Mic color={colors.surface} size={38} strokeWidth={2.6} />
-      </View>
-      <View className="items-center gap-2">
-        <Text className="text-[34px] font-bold text-app-text">Red Renote</Text>
-        <Text className="text-base font-medium text-app-muted">AI meeting memory</Text>
+    <AppScreen
+      className="bg-[#A30009]"
+      scroll={false}
+      contentClassName="items-center justify-center px-8"
+    >
+      <View className="absolute inset-x-[-40] top-[-60] h-80 rounded-full bg-[#CC121D]/25" />
+      <View className="absolute bottom-24 h-60 w-60 rounded-full bg-black/10" />
+      <BrandMark inverted />
+      <View className="absolute bottom-10 items-center">
+        <View className="h-1 w-8 rounded-full bg-white/90" />
       </View>
     </AppScreen>
   );
