@@ -143,7 +143,7 @@ export default function HomeRoute() {
       <SearchBar
         className="h-12 rounded-[20px] border-[#E7E5E4] bg-white"
         onChangeText={setQuery}
-        placeholder="Search mock meetings by title, project, tag, or date"
+        placeholder="Search meetings by title, project, tag, or date"
         value={query}
       />
 
@@ -164,7 +164,7 @@ export default function HomeRoute() {
             {visibleMeetings.length}
           </Text>
           <Text className="text-[13px] leading-5" style={{ color: colors.secondaryText }}>
-            {query.trim().length > 0 ? "Filtered locally from mock meeting data." : "All recent mock meetings are visible."}
+            {query.trim().length > 0 ? "Filtered from your Supabase meeting data." : "All recent meetings are visible."}
           </Text>
         </AppCard>
 
@@ -211,10 +211,10 @@ export default function HomeRoute() {
         ) : (
           <AppCard className="gap-2" padding="lg">
             <Text className="text-[15px] font-bold" style={{ color: colors.text }}>
-              No mock meetings match this search
+              No meetings match this search
             </Text>
             <Text className="text-[13px] leading-5" style={{ color: colors.secondaryText }}>
-              Try another title, date, project name, or tag. The filter only affects the local mock meeting list.
+              Try another title, date, project name, or tag.
             </Text>
           </AppCard>
         )}

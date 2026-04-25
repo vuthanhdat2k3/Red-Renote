@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
 
-import { aiMessages, currentUser, fullMeeting, meetings, tasks, transcriptSegments } from "@/data/mock";
 import {
+  DEFAULT_USER,
+  EMPTY_MEETING,
   getAIChatMessages,
   getDashboardData,
   getMeeting,
   getMeetingTasks,
   getTranscript,
 } from "@/lib/meeting-repository";
-import type { AIMessage, Meeting, Task, TranscriptItem } from "@/types/meeting";
+import type { AIMessage, Meeting, Task, TranscriptItem, User } from "@/types/meeting";
 
 type DashboardData = {
-  currentUser: typeof currentUser;
+  currentUser: User;
   meetings: Meeting[];
   tasks: Task[];
   featuredMeeting: Meeting;
@@ -19,20 +20,24 @@ type DashboardData = {
 
 export function useDashboardData() {
   const [data, setData] = useState<DashboardData>({
-    currentUser,
-    meetings,
-    tasks,
-    featuredMeeting: fullMeeting,
+    currentUser: DEFAULT_USER,
+    meetings: [],
+    tasks: [],
+    featuredMeeting: EMPTY_MEETING,
   });
 
   useEffect(() => {
     let isMounted = true;
 
-    getDashboardData().then((nextData) => {
-      if (isMounted) {
-        setData(nextData);
-      }
-    });
+    getDashboardData()
+      .then((nextData) => {
+        if (isMounted) {
+          setData(nextData);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
     return () => {
       isMounted = false;
@@ -43,16 +48,20 @@ export function useDashboardData() {
 }
 
 export function useMeeting(meetingId: string) {
-  const [meeting, setMeeting] = useState<Meeting>(fullMeeting);
+  const [meeting, setMeeting] = useState<Meeting>(EMPTY_MEETING);
 
   useEffect(() => {
     let isMounted = true;
 
-    getMeeting(meetingId).then((nextMeeting) => {
-      if (isMounted) {
-        setMeeting(nextMeeting);
-      }
-    });
+    getMeeting(meetingId)
+      .then((nextMeeting) => {
+        if (isMounted) {
+          setMeeting(nextMeeting);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
     return () => {
       isMounted = false;
@@ -63,16 +72,20 @@ export function useMeeting(meetingId: string) {
 }
 
 export function useMeetingTasks(meetingId?: string) {
-  const [items, setItems] = useState<Task[]>(tasks);
+  const [items, setItems] = useState<Task[]>([]);
 
   useEffect(() => {
     let isMounted = true;
 
-    getMeetingTasks(meetingId).then((nextTasks) => {
-      if (isMounted) {
-        setItems(nextTasks);
-      }
-    });
+    getMeetingTasks(meetingId)
+      .then((nextTasks) => {
+        if (isMounted) {
+          setItems(nextTasks);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
     return () => {
       isMounted = false;
@@ -83,16 +96,20 @@ export function useMeetingTasks(meetingId?: string) {
 }
 
 export function useTranscript(meetingId: string) {
-  const [items, setItems] = useState<TranscriptItem[]>(transcriptSegments);
+  const [items, setItems] = useState<TranscriptItem[]>([]);
 
   useEffect(() => {
     let isMounted = true;
 
-    getTranscript(meetingId).then((nextItems) => {
-      if (isMounted) {
-        setItems(nextItems);
-      }
-    });
+    getTranscript(meetingId)
+      .then((nextItems) => {
+        if (isMounted) {
+          setItems(nextItems);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
     return () => {
       isMounted = false;
@@ -103,16 +120,20 @@ export function useTranscript(meetingId: string) {
 }
 
 export function useAIChatMessages(meetingId: string) {
-  const [items, setItems] = useState<AIMessage[]>(aiMessages);
+  const [items, setItems] = useState<AIMessage[]>([]);
 
   useEffect(() => {
     let isMounted = true;
 
-    getAIChatMessages(meetingId).then((nextItems) => {
-      if (isMounted) {
-        setItems(nextItems);
-      }
-    });
+    getAIChatMessages(meetingId)
+      .then((nextItems) => {
+        if (isMounted) {
+          setItems(nextItems);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
     return () => {
       isMounted = false;
