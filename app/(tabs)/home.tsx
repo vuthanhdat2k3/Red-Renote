@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { Bell, CalendarDays, Mic, Search, Sparkles } from "lucide-react-native";
+import { Bell, BrainCircuit, CalendarDays, CheckCircle2, Mic, Sparkles } from "lucide-react-native";
 import { useDeferredValue, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 
@@ -9,10 +9,12 @@ import { FollowUpPill } from "@/components/home/FollowUpPill";
 import { HomeSection } from "@/components/home/HomeSection";
 import { ProjectFolderCard } from "@/components/home/ProjectFolderCard";
 import { StartRecordingCard } from "@/components/home/StartRecordingCard";
+import { StatusPill, TopExperience, TopMetric } from "@/components/shell/TopExperience";
 import { AppCard } from "@/components/ui/Card";
 import { AppScreen } from "@/components/ui/AppScreen";
+import { PressableScale } from "@/components/ui/PressableScale";
 import { SearchBar } from "@/components/ui/SearchBar";
-import { colors, radius } from "@/constants/tokens";
+import { colors } from "@/constants/tokens";
 import { useDashboardData } from "@/hooks/useMeetingData";
 import { useAppStore } from "@/store/app-store";
 import type { Meeting } from "@/types/meeting";
@@ -92,104 +94,92 @@ export default function HomeRoute() {
   };
 
   return (
-    <AppScreen contentClassName="gap-6 pb-8 pt-2">
-      <View className="flex-row items-start justify-between gap-4">
-        <View className="flex-1 gap-2">
-          <View className="flex-row items-center gap-2">
-            <View
-              className="h-10 w-10 items-center justify-center"
-              style={{ borderRadius: 20, backgroundColor: colors.text }}
-            >
-              <Mic color={colors.surface} size={16} strokeWidth={2.6} />
+    <AppScreen contentClassName="gap-8 pt-4">
+      <View className="absolute top-0 right-0 h-64 w-64 rounded-full bg-[#FFE1DA] opacity-30 -mr-20 -mt-20 blur-3xl" />
+      
+      <View className="px-6 gap-6">
+        <View className="flex-row items-center justify-between">
+          <View className="flex-row items-center gap-3">
+            <View className="h-10 w-10 items-center justify-center rounded-full bg-brand-primary/10 border border-brand-primary/20">
+              <Text className="text-[14px] font-bold text-brand-primary">{currentUser.name.charAt(0)}</Text>
             </View>
-            <View
-              className="rounded-full px-3 py-1.5"
-              style={{ backgroundColor: "#FFF1F0" }}
-            >
-              <Text className="text-[11px] font-semibold uppercase tracking-[0.8px]" style={{ color: "#8C151B" }}>
-                Home Dashboard
-              </Text>
+            <View>
+              <Text className="text-[12px] font-bold text-app-muted uppercase tracking-wider">{getTodayLabel()}</Text>
             </View>
           </View>
-
-          <View className="gap-1">
-            <Text className="text-[28px] font-bold leading-8" style={{ color: colors.text }}>
-              {getGreeting()}, {currentUser.name.split(" ")[0]}
-            </Text>
-            <Text className="text-[14px] leading-6" style={{ color: colors.secondaryText }}>
-              Keep today&apos;s meetings, tasks, and AI follow-ups in one place.
-            </Text>
-          </View>
+          
+          <PressableScale accessibilityLabel="Open notifications" accessibilityRole="button" scaleTo={0.92}>
+            <View className="h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm border border-app-border">
+              <Bell color={colors.text} size={18} strokeWidth={2.5} />
+              <View className="absolute right-2.5 top-2.5 h-2.5 w-2.5 rounded-full bg-brand-primary border-2 border-white" />
+            </View>
+          </PressableScale>
         </View>
 
-        <View className="items-end gap-3">
-          <View
-            className="h-10 w-10 items-center justify-center bg-white"
-            style={{ borderRadius: 20, borderWidth: 1, borderColor: colors.border }}
+        <View className="gap-2">
+          <Text className="text-[34px] font-extrabold tracking-tight text-app-text leading-[40px]">
+            {getGreeting()}, <Text className="text-brand-primary">{currentUser.name.split(" ")[0]}</Text>
+          </Text>
+          <Text className="text-[15px] leading-6 text-app-muted font-medium max-w-[85%]">
+            You have <Text className="text-brand-primary font-bold">{taskSummary.pending}</Text> follow-ups to review today.
+          </Text>
+        </View>
+
+        <View className="flex-row gap-3 mt-2">
+          <PressableScale 
+            className="flex-1 bg-white rounded-[24px] p-4 border border-[#FFE1DA] shadow-sm" 
+            onPress={() => router.push("/(tabs)/knowledge")}
+            scaleTo={0.96}
           >
-            <Bell color={colors.primary} size={17} strokeWidth={2.4} />
-          </View>
-          <View className="rounded-[18px] bg-white px-3 py-2" style={{ borderWidth: 1, borderColor: colors.border }}>
-            <View className="flex-row items-center gap-2">
-              <CalendarDays color={colors.secondaryText} size={14} strokeWidth={2.4} />
-              <Text className="text-[11px] font-semibold" style={{ color: colors.secondaryText }}>
-                {getTodayLabel()}
-              </Text>
+            <View className="flex-row items-center justify-between mb-3">
+              <View className="h-9 w-9 items-center justify-center rounded-full bg-[#FFF1F0]">
+                <BrainCircuit color={colors.primary} size={18} strokeWidth={2.5} />
+              </View>
+              <Text className="text-[24px] font-extrabold tracking-tight text-app-text">{visibleMeetings.length}</Text>
             </View>
-          </View>
+            <Text className="text-[13px] font-bold text-app-muted uppercase tracking-wider">Insights</Text>
+          </PressableScale>
+
+          <PressableScale 
+            className="flex-1 bg-white rounded-[24px] p-4 border border-app-border shadow-sm" 
+            onPress={() => router.push("/(tabs)/tasks")}
+            scaleTo={0.96}
+          >
+            <View className="flex-row items-center justify-between mb-3">
+              <View className="h-9 w-9 items-center justify-center rounded-full bg-blue-50">
+                <CheckCircle2 color={colors.blue} size={18} strokeWidth={2.5} />
+              </View>
+              <Text className="text-[24px] font-extrabold tracking-tight text-app-text">{taskSummary.pending}</Text>
+            </View>
+            <Text className="text-[13px] font-bold text-app-muted uppercase tracking-wider">Tasks</Text>
+          </PressableScale>
+          
+          <PressableScale 
+            className="flex-1 bg-white rounded-[24px] p-4 border border-app-border shadow-sm"
+            scaleTo={0.96}
+          >
+            <View className="flex-row items-center justify-between mb-3">
+              <View className="h-9 w-9 items-center justify-center rounded-full bg-green-50">
+                <Sparkles color={colors.success} size={18} strokeWidth={2.5} />
+              </View>
+              <Text className="text-[24px] font-extrabold tracking-tight text-app-text">{taskSummary.inProgress}</Text>
+            </View>
+            <Text className="text-[13px] font-bold text-app-muted uppercase tracking-wider">Active</Text>
+          </PressableScale>
         </View>
+
+        <SearchBar
+          onChangeText={setQuery}
+          placeholder="Ask about meetings, decisions..."
+          value={query}
+          onFilterPress={() => {}}
+          variant="ai"
+        />
       </View>
 
-      <SearchBar
-        className="h-12 rounded-[20px] border-[#E7E5E4] bg-white"
-        onChangeText={setQuery}
-        placeholder="Search meetings by title, project, tag, or date"
-        value={query}
-      />
-
-      <View className="flex-row gap-3">
-        <AppCard className="flex-1 gap-3 border-[#F4D4D7] bg-[#FFF7F6]" padding="md">
-          <View className="flex-row items-center gap-2">
-            <View
-              className="h-8 w-8 items-center justify-center"
-              style={{ borderRadius: radius.md, backgroundColor: "#FFF1F0" }}
-            >
-              <Search color={colors.primary} size={15} strokeWidth={2.5} />
-            </View>
-            <Text className="text-[12px] font-semibold uppercase tracking-[0.8px]" style={{ color: "#8C151B" }}>
-              Meetings found
-            </Text>
-          </View>
-          <Text className="text-[24px] font-bold" style={{ color: colors.text }}>
-            {visibleMeetings.length}
-          </Text>
-          <Text className="text-[13px] leading-5" style={{ color: colors.secondaryText }}>
-            {query.trim().length > 0 ? "Filtered from your Supabase meeting data." : "All recent meetings are visible."}
-          </Text>
-        </AppCard>
-
-        <AppCard className="flex-1 gap-3" padding="md">
-          <View className="flex-row items-center gap-2">
-            <View
-              className="h-8 w-8 items-center justify-center"
-              style={{ borderRadius: radius.md, backgroundColor: "#F4F4F5" }}
-            >
-              <Sparkles color={colors.text} size={15} strokeWidth={2.4} />
-            </View>
-            <Text className="text-[12px] font-semibold uppercase tracking-[0.8px]" style={{ color: colors.secondaryText }}>
-              Today&apos;s load
-            </Text>
-          </View>
-          <Text className="text-[24px] font-bold" style={{ color: colors.text }}>
-            {taskSummary.pending}
-          </Text>
-          <Text className="text-[13px] leading-5" style={{ color: colors.secondaryText }}>
-            {taskSummary.inProgress} already moving, the rest still need attention.
-          </Text>
-        </AppCard>
+      <View className="px-6">
+        <StartRecordingCard onPress={handleStartRecording} />
       </View>
-
-      <StartRecordingCard onPress={handleStartRecording} />
 
       <HomeSection action={`${visibleMeetings.length} shown`} title="Recent Meetings">
         {visibleMeetings.length > 0 ? (
@@ -242,9 +232,9 @@ export default function HomeRoute() {
           <View className="flex-row flex-wrap gap-y-2">
             {suggestedFollowUps.map((followUp) => (
               <FollowUpPill
-                  key={followUp}
-                  label={followUp}
-                  onPress={() => {
+                key={followUp}
+                label={followUp}
+                onPress={() => {
                   router.push({ pathname: "/meeting/[id]/tasks", params: { id: featuredMeeting.id } });
                 }}
               />

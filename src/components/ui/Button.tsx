@@ -1,9 +1,10 @@
 import type { PropsWithChildren } from "react";
-import { ActivityIndicator, Pressable, Text } from "react-native";
+import { ActivityIndicator, Text } from "react-native";
 import type { LucideIcon } from "lucide-react-native";
 
 import { colors } from "@/constants/tokens";
 import { cn } from "@/lib/cn";
+import { PressableScale } from "@/components/ui/PressableScale";
 
 export type AppButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 export type AppButtonSize = "sm" | "md" | "lg";
@@ -71,7 +72,7 @@ export function AppButton({
   const iconColor = variant === "primary" || variant === "danger" ? colors.surface : colors.primary;
 
   return (
-    <Pressable
+    <PressableScale
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
       className={cn(
@@ -84,11 +85,12 @@ export function AppButton({
       )}
       disabled={disabled || loading}
       onPress={onPress}
+      scaleTo={0.98}
     >
       {loading ? <ActivityIndicator color={iconColor} /> : Icon ? <Icon color={iconColor} size={18} strokeWidth={2.4} /> : null}
       <Text className={cn("font-semibold", textSizeClasses[size], textClasses[variant], textClassName)}>{children}</Text>
       {!loading && RightIcon ? <RightIcon color={iconColor} size={18} strokeWidth={2.4} /> : null}
-    </Pressable>
+    </PressableScale>
   );
 }
 

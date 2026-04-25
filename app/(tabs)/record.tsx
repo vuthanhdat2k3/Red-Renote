@@ -5,12 +5,12 @@ import {
   useAudioRecorderState,
 } from "expo-audio";
 import { router } from "expo-router";
-import { Pause, Play, Square, Waves } from "lucide-react-native";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Bot, Pause, Play, Square, Waves } from "lucide-react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Alert, Text, View } from "react-native";
 
-import { AppHeader } from "@/components/shell/AppHeader";
 import { RecordButton } from "@/components/shell/RecordButton";
+import { PulseDot, StatusPill, TopExperience, Waveform } from "@/components/shell/TopExperience";
 import { AppButton } from "@/components/ui/Button";
 import { AppScreen } from "@/components/ui/AppScreen";
 import { LoadingStep } from "@/components/ui/LoadingStep";
@@ -42,8 +42,6 @@ export default function RecordRoute() {
   const pauseRecording = useAppStore((state) => state.pauseRecording);
   const resumeRecording = useAppStore((state) => state.resumeRecording);
   const finishRecording = useAppStore((state) => state.finishRecording);
-
-  const waveformBars = useMemo(() => Array.from({ length: 18 }), []);
 
   const startRealRecording = useCallback(async () => {
     if (hasStartedRecorder.current) {
@@ -123,30 +121,37 @@ export default function RecordRoute() {
   const metering = typeof recorderState.metering === "number" ? Math.max(0.15, Math.min(1, (recorderState.metering + 60) / 60)) : 0.65;
 
   return (
-    <AppScreen contentClassName="gap-6">
-      <AppHeader title="Live Recording" subtitle="Real microphone recorder" />
-      <View className="items-center gap-5 rounded-[28px] bg-brand-primary p-8">
-        <RecordButton compact />
-        <View className="items-center gap-2">
-          <Text className="text-[28px] font-bold text-white">{statusText}</Text>
-          <Text className="text-base font-semibold text-white/85">{durationText}</Text>
-          <Text className="text-center text-base leading-6 text-white/80">
-            Audio is being captured to a local file. Transcript, tasks, and summary are still generated in the processing step.
-          </Text>
+    <AppScreen contentClassName="gap-5">
+      <TopExperience
+        className="overflow-hidden rounded-[26px] border border-white/15 bg-[#161111] p-6"
+        style={{ shadowColor: colors.primary, shadowOffset: { width: 0, height: 14 }, shadowOpacity: 0.18, shadowRadius: 28, elevation: 7 }}
+      >
+        <View className="absolute -right-12 -top-10 h-36 w-36 rounded-full bg-[#FF3B30]/40" />
+        <View className="absolute -bottom-16 left-4 h-40 w-40 rounded-full bg-[#2563EB]/20" />
+        <View className="gap-6">
+          <View className="flex-row items-center justify-between gap-3">
+            <View className="flex-row items-center gap-2 rounded-full bg-white/10 px-3 py-2">
+              <PulseDot active={recorderState.isRecording} color={recorderState.isRecording ? "#FF5A52" : "#F59E0B"} />
+              <Text className="text-[13px] font-bold text-white">{statusText}</Text>
+            </View>
+            <StatusPill icon={Bot} tone="neutral">AI notes active</StatusPill>
+          </View>
+
+          <View className="items-center gap-3">
+            <View className="rounded-full bg-white/12 p-3">
+              <RecordButton compact />
+            </View>
+            <View className="items-center gap-2">
+              <Text className="text-[44px] font-extrabold leading-[50px] text-white">{durationText}</Text>
+              <Text className="text-center text-[15px] leading-6 text-white/76">
+                Capturing decisions, owners, and follow-ups for analysis.
+              </Text>
+            </View>
+          </View>
+
+          <Waveform active={recorderState.isRecording} metering={metering} />
         </View>
-        <View className="h-16 w-full flex-row items-center justify-center gap-1">
-          {waveformBars.map((_, index) => (
-            <View
-              className="w-1.5 rounded-full bg-white/80"
-              key={index}
-              style={{
-                height: 12 + ((index * 11) % 42) * metering,
-                opacity: recorderState.isRecording ? 1 : 0.45,
-              }}
-            />
-          ))}
-        </View>
-      </View>
+      </TopExperience>
       <LoadingStep
         description={recorderError ?? recorderState.url ?? activeRecordingId ?? "Preparing recorder"}
         status={recorderError ? "pending" : isPreparing ? "loading" : "done"}

@@ -1,7 +1,8 @@
 import { ArrowRight, Mic, Sparkles, Waves } from "lucide-react-native";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
-import { colors, radius, shadows } from "@/constants/tokens";
+import { colors, shadows } from "@/constants/tokens";
+import { PressableScale } from "@/components/ui/PressableScale";
 
 type StartRecordingCardProps = {
   onPress: () => void;
@@ -10,92 +11,71 @@ type StartRecordingCardProps = {
 export function StartRecordingCard({ onPress }: StartRecordingCardProps) {
   return (
     <View
-      className="overflow-hidden border border-[#F4D4D7] bg-white px-5 py-5"
-      style={{ borderRadius: radius.xl + 4, ...shadows.card }}
+      className="overflow-hidden bg-white p-6 border border-app-border shadow-sm"
+      style={{ borderRadius: 28 }}
     >
-      <View
-        className="absolute -right-10 -top-12 h-36 w-36 rounded-full"
-        style={{ backgroundColor: "#FFF1F0" }}
-      />
-      <View
-        className="absolute -bottom-10 -left-8 h-28 w-28 rounded-full"
-        style={{ backgroundColor: "#FFF7ED" }}
-      />
+      <View className="absolute right-0 top-0 h-40 w-40 rounded-full bg-[#FFF1F0] opacity-60 -mr-10 -mt-10" />
+      <View className="absolute bottom-0 left-0 h-32 w-32 rounded-full bg-[#F0F7FF] opacity-60 -ml-10 -mb-10" />
 
-      <View className="gap-5">
-        <View className="flex-row items-start justify-between gap-4">
-          <View className="flex-1 gap-2">
-            <View className="flex-row items-center gap-2">
-              <View
-                className="h-8 w-8 items-center justify-center"
-                style={{ borderRadius: radius.md, backgroundColor: "#FFF1F0" }}
-              >
-                <Sparkles color={colors.primary} size={16} strokeWidth={2.5} />
-              </View>
-              <Text className="text-[13px] font-semibold uppercase tracking-[0.8px]" style={{ color: colors.primary }}>
-                Start Recording
-              </Text>
-            </View>
-
-            <Text className="text-[24px] font-bold leading-8" style={{ color: colors.text }}>
-              Capture the next meeting before the action items disappear.
-            </Text>
-
-            <Text className="text-[14px] leading-6" style={{ color: colors.secondaryText }}>
-              Record live audio, generate the summary, and surface tasks and follow-ups in one flow.
-            </Text>
-          </View>
-
+      <View className="gap-4">
+        <View className="flex-row items-center gap-3">
           <View
-            className="h-14 w-14 items-center justify-center"
-            style={{ borderRadius: 20, backgroundColor: colors.text }}
+            className="h-10 w-10 items-center justify-center rounded-full bg-red-50 border border-[#FFE1DA]"
           >
-            <Waves color={colors.surface} size={22} strokeWidth={2.1} />
+            <Sparkles color={colors.primary} size={18} strokeWidth={2.5} />
           </View>
+          <Text className="text-[13px] font-bold uppercase tracking-wider text-brand-primary">
+            AI Assistant Ready
+          </Text>
         </View>
 
-        <View className="flex-row items-center gap-2">
-          <View
-            className="rounded-full px-3 py-2"
-            style={{ backgroundColor: "#FFF1F0" }}
-          >
-            <Text className="text-[12px] font-semibold" style={{ color: "#8C151B" }}>
+        <View className="gap-2 mt-1">
+          <Text className="text-[24px] font-extrabold leading-8 text-app-text pr-4">
+            Capture your next meeting live.
+          </Text>
+
+          <Text className="text-[15px] leading-6 text-app-muted pr-2">
+            Record audio to instantly generate summaries, exact tasks, and perfectly formatted follow-ups.
+          </Text>
+        </View>
+
+        <View className="flex-row items-center gap-2 mt-2">
+          <View className="rounded-full px-3 py-1.5 bg-[#FFF1F0] border border-[#FFE1DA]">
+            <Text className="text-[12px] font-bold text-[#8C151B]">
               Live transcript
             </Text>
           </View>
-          <View
-            className="rounded-full px-3 py-2"
-            style={{ backgroundColor: "#F4F4F5" }}
-          >
-            <Text className="text-[12px] font-semibold" style={{ color: colors.text }}>
-              AI task extraction
+          <View className="rounded-full px-3 py-1.5 bg-app-background border border-app-border">
+            <Text className="text-[12px] font-bold text-app-text">
+              Auto-extraction
             </Text>
           </View>
         </View>
       </View>
 
-      <Pressable
+      <PressableScale
         accessibilityLabel="Start recording"
         accessibilityRole="button"
-        className="mt-5 flex-row items-center justify-between px-5 py-4"
+        className="mt-8 flex-row items-center justify-between px-5 py-4"
         onPress={onPress}
         style={{
-          borderRadius: radius.xl,
+          borderRadius: 20,
           backgroundColor: colors.primary,
           ...shadows.redGlow,
         }}
+        scaleTo={0.97}
       >
-        <View className="flex-row items-center gap-3">
-          <View className="h-10 w-10 items-center justify-center rounded-full bg-white/15">
-            <Mic color={colors.surface} size={18} strokeWidth={2.5} />
+        <View className="flex-row items-center gap-3.5">
+          <View className="h-10 w-10 items-center justify-center rounded-full bg-white/20">
+            <Mic color={colors.surface} size={20} strokeWidth={2.5} />
           </View>
           <View>
             <Text className="text-[16px] font-bold text-white">Start Recording</Text>
-            <Text className="text-[12px] text-white/80">Open live recording</Text>
+            <Text className="text-[13px] font-medium text-white/80">Tap to begin session</Text>
           </View>
         </View>
-        <ArrowRight color={colors.surface} size={18} strokeWidth={2.5} />
-      </Pressable>
+        <ArrowRight color={colors.surface} size={20} strokeWidth={2.5} />
+      </PressableScale>
     </View>
   );
 }

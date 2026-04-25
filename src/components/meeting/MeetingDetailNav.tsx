@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { Headphones, MessageCircle, Network, ScrollText, Sparkles, SquareCheckBig } from "lucide-react-native";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { colors } from "@/constants/tokens";
 import { cn } from "@/lib/cn";
@@ -23,32 +23,37 @@ const tabs = [
 
 export function MeetingDetailNav({ meetingId, activeTab }: MeetingDetailNavProps) {
   return (
-    <View className="flex-row items-center justify-between gap-1 rounded-[28px] border border-app-border bg-white px-2 py-2">
-      {tabs.map((tab) => {
-        const Icon = tab.icon;
-        const isActive = tab.key === activeTab;
+    <View className="mx-[-20px]">
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-2 px-5">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = tab.key === activeTab;
 
-        return (
-          <Pressable
-            accessibilityLabel={tab.label}
-            accessibilityRole="button"
-            className={cn("flex-1 items-center gap-1 rounded-[20px] px-1 py-2.5", isActive ? "bg-red-50" : "bg-transparent")}
-            key={tab.key}
-            onPress={() => {
-              if (isActive) {
-                return;
-              }
+          return (
+            <Pressable
+              accessibilityLabel={tab.label}
+              accessibilityRole="button"
+              className={cn(
+                "min-w-[92px] flex-row items-center justify-center gap-2 rounded-xl border px-3 py-3",
+                isActive ? "border-brand-primary bg-red-50" : "border-app-border bg-white",
+              )}
+              key={tab.key}
+              onPress={() => {
+                if (isActive) {
+                  return;
+                }
 
-              router.replace({ pathname: `/meeting/[id]/${tab.key}`, params: { id: meetingId } });
-            }}
-          >
-            <Icon color={isActive ? colors.primary : colors.secondaryText} size={18} strokeWidth={2.3} />
-            <Text className={cn("text-[10px] font-semibold", isActive ? "text-brand-primary" : "text-app-muted")}>
-              {tab.label}
-            </Text>
-          </Pressable>
-        );
-      })}
+                router.replace({ pathname: `/meeting/[id]/${tab.key}`, params: { id: meetingId } });
+              }}
+            >
+              <Icon color={isActive ? colors.primary : colors.secondaryText} size={16} strokeWidth={2.3} />
+              <Text className={cn("text-[12px] font-semibold", isActive ? "text-brand-primary" : "text-app-muted")}>
+                {tab.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
     </View>
   );
 }

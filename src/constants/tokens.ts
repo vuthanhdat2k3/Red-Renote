@@ -1,12 +1,16 @@
 export const colors = {
-  primary: "#E50914",
+  primary: "#FF3B30",
   darkRed: "#8B0000",
-  softRed: "#FF6B6B",
-  background: "#FAFAFA",
+  softRed: "#FF6A3D",
+  blue: "#2563EB",
+  softBlue: "#EFF6FF",
+  softGreen: "#ECFDF3",
+  softOrange: "#FFF7ED",
+  background: "#F7F7F8",
   surface: "#FFFFFF",
   text: "#111111",
-  secondaryText: "#6B7280",
-  border: "#E5E7EB",
+  secondaryText: "#656B76",
+  border: "#E6E8EC",
   success: "#147A4D",
   warning: "#B45309",
 } as const;
@@ -22,9 +26,9 @@ export const spacing = {
 
 export const radius = {
   sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 24,
+  md: 10,
+  lg: 14,
+  xl: 18,
   pill: 999,
 } as const;
 
@@ -54,16 +58,16 @@ export const typography = {
 export const shadows = {
   card: {
     shadowColor: "#111111",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.06,
-    shadowRadius: 24,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.04,
+    shadowRadius: 14,
+    elevation: 2,
   },
   redGlow: {
     shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.24,
-    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 18,
     elevation: 5,
   },
 } as const;

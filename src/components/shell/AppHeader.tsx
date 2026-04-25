@@ -14,11 +14,11 @@ export type AppHeaderProps = {
 
 export function AppHeader({ title, subtitle, showBackButton, onBackPress, rightAction }: AppHeaderProps) {
   return (
-    <View className="flex-row items-center justify-between gap-4 pt-2">
+    <View className="min-h-[58px] flex-row items-center justify-between gap-3 pt-1">
       {showBackButton ? <IconButton icon={ChevronLeft} label="Go back" onPress={onBackPress} /> : null}
       <View className="flex-1">
-        {subtitle ? <Text className="text-sm font-medium text-app-muted">{subtitle}</Text> : null}
-        <Text className="text-[28px] font-bold leading-9 text-app-text">{title}</Text>
+        {subtitle ? <Text className="text-[13px] font-medium text-app-muted" numberOfLines={1}>{subtitle}</Text> : null}
+        <Text className="text-[25px] font-bold leading-8 text-app-text" numberOfLines={1}>{title}</Text>
       </View>
       {rightAction ? <View className="flex-row items-center gap-2">{rightAction}</View> : null}
     </View>

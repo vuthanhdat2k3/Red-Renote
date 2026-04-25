@@ -17,7 +17,7 @@ export function LoadingStep({ title, description, status }: LoadingStepProps) {
   const isLoading = status === "loading";
 
   return (
-    <View className="flex-row items-center gap-3 rounded-2xl border border-app-border bg-app-surface p-4">
+    <View className="flex-row items-center gap-3 rounded-xl border border-app-border bg-white p-4">
       <View className={cn("h-10 w-10 items-center justify-center rounded-full", isDone ? "bg-brand-primary" : "bg-red-50")}>
         {isLoading ? (
           <ActivityIndicator color={colors.primary} />

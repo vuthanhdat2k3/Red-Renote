@@ -20,7 +20,7 @@ const paddingClasses: Record<AppCardPadding, string> = {
 
 export function AppCard({ children, padding = "md", className }: AppCardProps) {
   return (
-    <View className={cn("rounded-2xl border border-app-border bg-app-surface", paddingClasses[padding], className)} style={shadows.card}>
+    <View className={cn("rounded-xl border border-app-border bg-app-surface", paddingClasses[padding], className)} style={shadows.card}>
       {children}
     </View>
   );

@@ -6,16 +6,16 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          primary: "#E50914",
+          primary: "#FF3B30",
           dark: "#8B0000",
-          soft: "#FF6B6B",
+          soft: "#FF6A3D",
         },
         app: {
-          background: "#FAFAFA",
+          background: "#F7F7F8",
           surface: "#FFFFFF",
           text: "#111111",
-          muted: "#6B7280",
-          border: "#E5E7EB",
+          muted: "#656B76",
+          border: "#E6E8EC",
         },
       },
       fontFamily: {

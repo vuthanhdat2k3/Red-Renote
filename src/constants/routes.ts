@@ -9,8 +9,8 @@ export type TabRoute = {
 
 export const tabRoutes: TabRoute[] = [
   { name: "home", title: "Home", icon: Home },
-  { name: "record", title: "Record", icon: Mic },
   { name: "knowledge", title: "Knowledge", icon: BookOpen },
+  { name: "record", title: "Record", icon: Mic },
   { name: "tasks", title: "Tasks", icon: ClipboardList },
   { name: "profile", title: "Profile", icon: UserRound },
 ];

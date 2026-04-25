@@ -5,6 +5,7 @@ export * from "./Card";
 export * from "./EmptyState";
 export * from "./IconButton";
 export * from "./LoadingStep";
+export * from "./PressableScale";
 export * from "./SearchBar";
 export * from "./SectionHeader";
 export * from "./SectionTitle";

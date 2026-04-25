@@ -1,11 +1,10 @@
 import { router } from "expo-router";
-import { BookOpen, ChevronRight, Search } from "lucide-react-native";
+import { BookOpen, ChevronRight, Sparkles } from "lucide-react-native";
 import { useDeferredValue, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
-import { AppHeader } from "@/components/shell/AppHeader";
 import { AppScreen } from "@/components/ui/AppScreen";
-import { Card } from "@/components/ui/Card";
+import { PressableScale } from "@/components/ui/PressableScale";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { colors } from "@/constants/tokens";
@@ -33,58 +32,83 @@ export default function KnowledgeRoute() {
   });
 
   return (
-    <AppScreen contentClassName="gap-5">
-      <AppHeader title="Knowledge" subtitle="Searchable meeting memory" />
-      <SearchBar onChangeText={setQuery} placeholder="Search summaries, decisions, projects, or tags" value={query} />
-      <Card className="gap-4">
-        <View className="flex-row items-start gap-3">
-          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-red-50">
-            <BookOpen color={colors.primary} size={24} strokeWidth={2.3} />
+    <AppScreen contentClassName="gap-8 pt-4">
+      <View className="absolute top-0 right-0 h-64 w-64 rounded-full bg-blue-100 opacity-30 -mr-20 -mt-20 blur-3xl" />
+      
+      <View className="px-6 gap-6">
+        <View className="flex-row items-center justify-between">
+          <View className="h-10 w-10 items-center justify-center rounded-full bg-blue-50 border border-blue-100">
+            <BookOpen color={colors.blue} size={18} strokeWidth={2.5} />
           </View>
-          <View className="flex-1 gap-1">
-            <Text className="text-[20px] font-bold text-app-text">{visibleMeetings.length} saved meetings</Text>
-            <Text className="text-base leading-6 text-app-muted">
-              Search across summaries, key decisions, tags, and project folders.
-            </Text>
+          <View className="h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm border border-app-border">
+            <Sparkles color={colors.primary} size={18} strokeWidth={2.5} />
           </View>
         </View>
-      </Card>
-      <View className="gap-3">
+
+        <View className="gap-2">
+          <Text className="text-[34px] font-extrabold tracking-tight text-app-text leading-[40px]">
+            Ask your <Text className="text-blue-600">meetings.</Text>
+          </Text>
+          <Text className="text-[15px] leading-6 text-app-muted font-medium max-w-[90%]">
+            Search decisions, people, and context with source-backed AI memory.
+          </Text>
+        </View>
+
+        <SearchBar
+          onChangeText={setQuery}
+          placeholder="Ask about meetings, decisions..."
+          value={query}
+          variant="ai"
+        />
+
+        <View className="flex-row gap-3">
+          <View className="flex-1 bg-blue-50/50 rounded-2xl p-4 border border-blue-100">
+            <Text className="text-[20px] font-extrabold text-blue-700">{visibleMeetings.length}</Text>
+            <Text className="text-[11px] font-bold text-blue-600/70 uppercase tracking-widest mt-1">Results</Text>
+          </View>
+          <View className="flex-1 bg-emerald-50/50 rounded-2xl p-4 border border-emerald-100">
+            <Text className="text-[20px] font-extrabold text-emerald-700">{meetings.reduce((total, m) => total + m.decisions.length, 0)}</Text>
+            <Text className="text-[11px] font-bold text-emerald-600/70 uppercase tracking-widest mt-1">Decisions</Text>
+          </View>
+        </View>
+      </View>
+
+      <View className="gap-4 px-6 pb-10">
         <SectionTitle title="Meeting Memory" />
-        {visibleMeetings.map((meeting) => (
-          <Pressable
-            accessibilityRole="button"
-            className="gap-3 rounded-2xl border border-app-border bg-app-surface p-4"
-            key={meeting.id}
-            onPress={() => {
-              router.push({ pathname: "/meeting/[id]/summary", params: { id: meeting.id } });
-            }}
-          >
-            <View className="flex-row items-start justify-between gap-3">
-              <View className="flex-1 gap-1">
-                <Text className="text-[16px] font-bold leading-6 text-app-text">{meeting.title}</Text>
-                <Text className="text-sm font-semibold text-brand-primary">{meeting.project}</Text>
-              </View>
-              <ChevronRight color={colors.secondaryText} size={18} strokeWidth={2.4} />
-            </View>
-            <Text className="text-sm leading-6 text-app-muted" numberOfLines={3}>
-              {meeting.summary}
-            </Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-2">
-              {meeting.tags.map((tag) => (
-                <View className="rounded-full bg-red-50 px-3 py-1.5" key={tag}>
-                  <Text className="text-xs font-semibold text-brand-primary">{tag}</Text>
+        <View className="gap-4">
+          {visibleMeetings.map((meeting) => (
+            <PressableScale
+              key={meeting.id}
+              className="gap-4 rounded-3xl border border-app-border bg-white p-5 shadow-sm"
+              onPress={() => {
+                router.push({ pathname: "/meeting/[id]/summary", params: { id: meeting.id } });
+              }}
+              scaleTo={0.98}
+            >
+              <View className="flex-row items-start justify-between">
+                <View className="flex-1 gap-1">
+                  <Text className="text-xs font-bold uppercase tracking-wider text-brand-primary">{meeting.project}</Text>
+                  <Text className="text-[18px] font-bold leading-6 text-app-text">{meeting.title}</Text>
                 </View>
-              ))}
-            </ScrollView>
-          </Pressable>
-        ))}
-        {visibleMeetings.length === 0 ? (
-          <Card className="flex-row items-center gap-3">
-            <Search color={colors.secondaryText} size={20} strokeWidth={2.3} />
-            <Text className="flex-1 text-sm leading-6 text-app-muted">No saved meeting memory matches this search.</Text>
-          </Card>
-        ) : null}
+                <View className="h-8 w-8 items-center justify-center rounded-full bg-app-background">
+                  <ChevronRight color={colors.secondaryText} size={16} strokeWidth={2.5} />
+                </View>
+              </View>
+              
+              <Text className="text-sm leading-6 text-app-muted" numberOfLines={2}>
+                {meeting.summary}
+              </Text>
+
+              <View className="flex-row flex-wrap gap-2">
+                {meeting.tags.slice(0, 3).map((tag) => (
+                  <View key={tag} className="rounded-full bg-app-background border border-app-border px-3 py-1">
+                    <Text className="text-[11px] font-bold text-app-muted">{tag}</Text>
+                  </View>
+                ))}
+              </View>
+            </PressableScale>
+          ))}
+        </View>
       </View>
     </AppScreen>
   );

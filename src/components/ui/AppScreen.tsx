@@ -23,7 +23,7 @@ export function AppScreen({ children, scroll = true, className, contentClassName
     <SafeAreaView className={cn("flex-1 bg-app-background", className)} edges={["top", "left", "right"]}>
       <ScrollView
         className="flex-1"
-        contentContainerClassName={cn("gap-6 px-5 pb-10", contentClassName)}
+        contentContainerClassName={cn("gap-5 px-5 pb-28 pt-1", contentClassName)}
         showsVerticalScrollIndicator={false}
       >
         {children}
