@@ -1,10 +1,27 @@
-import { Tabs } from "expo-router";
+import { Redirect, Tabs, type Href } from "expo-router";
+import { ActivityIndicator, View } from "react-native";
 
 import { BottomTabBar } from "@/components/shell/BottomTabBar";
 import { colors } from "@/constants/tokens";
 import { tabRoutes } from "@/constants/routes";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function TabLayout() {
+  const isAuthReady = useAuthStore((state) => state.isReady);
+  const session = useAuthStore((state) => state.session);
+
+  if (!isAuthReady) {
+    return (
+      <View className="flex-1 items-center justify-center bg-app-background">
+        <ActivityIndicator color={colors.primary} />
+      </View>
+    );
+  }
+
+  if (!session) {
+    return <Redirect href={"/login" as Href} />;
+  }
+
   return (
     <Tabs
       tabBar={(props) => <BottomTabBar {...props} />}

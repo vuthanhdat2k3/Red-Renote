@@ -1,4 +1,5 @@
 import { router } from "expo-router";
+import type { Href } from "expo-router";
 import { LockKeyhole, Mic } from "lucide-react-native";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -11,14 +12,22 @@ import {
   requestMicrophonePermission,
 } from "@/lib/microphone-permission";
 import { useAppStore } from "@/store/app-store";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function MicrophonePermissionRoute() {
   const grantMicrophonePermission = useAppStore((state) => state.grantMicrophonePermission);
+  const isAuthReady = useAuthStore((state) => state.isReady);
+  const session = useAuthStore((state) => state.session);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [canAskAgain, setCanAskAgain] = useState(true);
 
   const handlePermission = async () => {
+    if (isAuthReady && !session) {
+      router.replace("/login" as Href);
+      return;
+    }
+
     setIsLoading(true);
 
     try {

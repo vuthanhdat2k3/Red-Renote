@@ -1,6 +1,7 @@
 import { router } from "expo-router";
+import type { Href } from "expo-router";
 import { ArrowRight } from "lucide-react-native";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { BrandMark } from "@/components/launch/BrandMark";
 import { EntryPrimaryButton } from "@/components/launch/EntryPrimaryButton";
@@ -40,14 +41,24 @@ export default function OnboardingRoute() {
           icon={ArrowRight}
           onPress={() => {
             completeOnboarding();
-            router.replace("/microphone-permission");
+            router.replace("/register" as Href);
           }}
         >
           Get Started
         </EntryPrimaryButton>
-        <Text className="text-center text-[13px]" style={{ color: colors.primary }}>
-          I already have an account
-        </Text>
+        <Pressable
+          accessibilityLabel="I already have an account"
+          accessibilityRole="button"
+          className="items-center justify-center py-2"
+          onPress={() => {
+            completeOnboarding();
+            router.replace("/login" as Href);
+          }}
+        >
+          <Text className="text-center text-[13px] font-semibold" style={{ color: colors.primary }}>
+            I already have an account
+          </Text>
+        </Pressable>
       </View>
     </AppScreen>
   );

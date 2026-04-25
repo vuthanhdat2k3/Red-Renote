@@ -5,18 +5,25 @@ import { View } from "react-native";
 import { BrandMark } from "@/components/launch/BrandMark";
 import { AppScreen } from "@/components/ui/AppScreen";
 import { useAppStore } from "@/store/app-store";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function SplashRoute() {
   const markSplashSeen = useAppStore((state) => state.markSplashSeen);
+  const isAuthReady = useAuthStore((state) => state.isReady);
+  const session = useAuthStore((state) => state.session);
 
   useEffect(() => {
+    if (!isAuthReady) {
+      return;
+    }
+
     const timer = setTimeout(() => {
       markSplashSeen();
-      router.replace("/onboarding");
+      router.replace(session ? "/(tabs)/home" : "/onboarding");
     }, 1200);
 
     return () => clearTimeout(timer);
-  }, [markSplashSeen]);
+  }, [isAuthReady, markSplashSeen, session]);
 
   return (
     <AppScreen
