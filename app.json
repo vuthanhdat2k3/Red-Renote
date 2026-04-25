@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "Red Renote",
+    "slug": "red-renote",
+    "scheme": "redrenote",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#FAFAFA"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.redrenote.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#FAFAFA"
+      },
+      "package": "com.redrenote.app"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
