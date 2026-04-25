@@ -11,9 +11,16 @@ export default function RootLayout() {
       <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
-        <Stack.Screen name="(onboarding)" />
+        <Stack.Screen name="splash" />
+        <Stack.Screen name="onboarding" />
+        <Stack.Screen name="microphone-permission" />
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="(modals)" options={{ presentation: "modal" }} />
+        <Stack.Screen name="processing/[recordingId]" />
+        <Stack.Screen name="meeting/[id]/summary" />
+        <Stack.Screen name="meeting/[id]/transcript" />
+        <Stack.Screen name="meeting/[id]/chat" />
+        <Stack.Screen name="meeting/[id]/mindmap" />
+        <Stack.Screen name="meeting/[id]/tasks" />
       </Stack>
     </SafeAreaProvider>
   );

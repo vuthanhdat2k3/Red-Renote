@@ -14,6 +14,7 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colors.secondaryText,
       }}
     >
+      <Tabs.Screen name="index" options={{ href: null }} />
       {tabRoutes.map((route) => {
         const Icon = route.icon;
 
