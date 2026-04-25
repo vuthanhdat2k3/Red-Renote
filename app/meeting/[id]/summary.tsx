@@ -9,6 +9,7 @@ import { AppButton } from "@/components/ui/Button";
 import { AppCard } from "@/components/ui/Card";
 import { AppScreen } from "@/components/ui/AppScreen";
 import { SectionTitle } from "@/components/ui/SectionTitle";
+import { fullMeeting } from "@/data/mock";
 
 export default function MeetingSummaryRoute() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -21,17 +22,24 @@ export default function MeetingSummaryRoute() {
       <AppCard className="gap-4" padding="lg">
         <View className="flex-row flex-wrap gap-2">
           <AIChip active label="AI summary" />
-          <AIChip label="6 decisions" />
-          <AIChip label="4 tasks" />
+          <AIChip label={`${fullMeeting.decisions.length} decisions`} />
+          <AIChip label={`${fullMeeting.tasks.length} tasks`} />
         </View>
-        <Text className="text-[22px] font-bold leading-7 text-app-text">Q2 Growth Review</Text>
-        <Text className="text-[15px] leading-6 text-app-muted">
-          The team aligned on onboarding risk, pricing experiments, and a faster follow-up loop for enterprise accounts.
-        </Text>
+        <Text className="text-[22px] font-bold leading-7 text-app-text">{fullMeeting.title}</Text>
+        <Text className="text-sm font-semibold text-brand-primary">{fullMeeting.project}</Text>
+        <Text className="text-[15px] leading-6 text-app-muted">{fullMeeting.summary}</Text>
       </AppCard>
       <View className="gap-3">
+        <SectionTitle title="Key takeaways" />
+        {fullMeeting.keyTakeaways.map((item) => (
+          <AppCard key={item}>
+            <Text className="text-[15px] font-semibold leading-6 text-app-text">{item}</Text>
+          </AppCard>
+        ))}
+      </View>
+      <View className="gap-3">
         <SectionTitle title="Key decisions" />
-        {["Separate pricing experiment from onboarding work", "Prioritize renewal-risk accounts this week", "Review task ownership in Friday standup"].map((item) => (
+        {fullMeeting.decisions.map((item) => (
           <AppCard key={item}>
             <Text className="text-[15px] font-semibold leading-6 text-app-text">{item}</Text>
           </AppCard>

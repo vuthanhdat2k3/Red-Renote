@@ -1,65 +1,368 @@
-import type { Insight, Meeting, MeetingTask, TranscriptSegment } from "@/types/meeting";
+import type { AIMessage, Insight, Meeting, MindmapNode, Task, TranscriptItem, User } from "@/types/meeting";
+
+export const currentUser: User = {
+  id: "user-001",
+  name: "Linh Tran",
+  email: "linh.tran@redrenote.ai",
+  avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=160&h=160&fit=crop&crop=faces",
+  plan: "business",
+};
+
+export const fullMeetingId = "meeting-product-planning-q2";
+
+export const fullTranscript: TranscriptItem[] = [
+  {
+    id: "tr-001",
+    speaker: "Mina Patel",
+    speakerColor: "#E50914",
+    timestamp: "00:42",
+    text: "The main goal today is to lock the Q2 product planning priorities before sprint planning starts tomorrow.",
+    isHighlighted: true,
+  },
+  {
+    id: "tr-002",
+    speaker: "Alex Romero",
+    speakerColor: "#005AAB",
+    timestamp: "02:15",
+    text: "Usage data shows teams are opening summaries, but task conversion drops when owners are not assigned automatically.",
+    isHighlighted: false,
+  },
+  {
+    id: "tr-003",
+    speaker: "Linh Tran",
+    speakerColor: "#8B0000",
+    timestamp: "04:03",
+    text: "From a design perspective, the dashboard needs to make the next meeting action obvious without adding another card stack.",
+    isHighlighted: true,
+  },
+  {
+    id: "tr-004",
+    speaker: "Jordan Lee",
+    speakerColor: "#147A4D",
+    timestamp: "06:28",
+    text: "Engineering can support auto-owner detection if we keep the first version limited to explicit names and calendar attendees.",
+    isHighlighted: false,
+  },
+  {
+    id: "tr-005",
+    speaker: "Mina Patel",
+    speakerColor: "#E50914",
+    timestamp: "09:11",
+    text: "That constraint is acceptable for beta. We need reliability more than broad language coverage in this release.",
+    isHighlighted: true,
+  },
+  {
+    id: "tr-006",
+    speaker: "Alex Romero",
+    speakerColor: "#005AAB",
+    timestamp: "12:34",
+    text: "Customer interviews also asked for a clearer difference between AI suggestions and confirmed decisions.",
+    isHighlighted: false,
+  },
+  {
+    id: "tr-007",
+    speaker: "Linh Tran",
+    speakerColor: "#8B0000",
+    timestamp: "15:09",
+    text: "I will update the design review checklist so AI chips use softer red while confirmed decisions use stronger contrast.",
+    isHighlighted: false,
+  },
+  {
+    id: "tr-008",
+    speaker: "Jordan Lee",
+    speakerColor: "#147A4D",
+    timestamp: "18:47",
+    text: "The risk is notification fatigue. If every extracted task sends a push, managers will disable alerts quickly.",
+    isHighlighted: true,
+  },
+  {
+    id: "tr-009",
+    speaker: "Mina Patel",
+    speakerColor: "#E50914",
+    timestamp: "22:06",
+    text: "Let's ship grouped daily digests for generated tasks and reserve immediate notifications for manually confirmed owners.",
+    isHighlighted: true,
+  },
+  {
+    id: "tr-010",
+    speaker: "Alex Romero",
+    speakerColor: "#005AAB",
+    timestamp: "27:41",
+    text: "For sprint planning, I suggest three workstreams: task extraction, dashboard hierarchy, and transcript search quality.",
+    isHighlighted: false,
+  },
+  {
+    id: "tr-011",
+    speaker: "Jordan Lee",
+    speakerColor: "#147A4D",
+    timestamp: "31:18",
+    text: "Task extraction can be split into parser rules, confidence scoring, and the review queue UI contract.",
+    isHighlighted: false,
+  },
+  {
+    id: "tr-012",
+    speaker: "Mina Patel",
+    speakerColor: "#E50914",
+    timestamp: "36:52",
+    text: "Decision is final: Q2 beta focuses on trustworthy follow-ups, summary clarity, and searchable meeting memory.",
+    isHighlighted: true,
+  },
+];
+
+export const fullTasks: Task[] = [
+  {
+    id: "task-001",
+    title: "Draft auto-owner detection scope for beta",
+    owner: "Jordan Lee",
+    deadline: "Apr 29, 2026",
+    status: "in_progress",
+    sourceTimestamp: "06:28",
+    meetingId: fullMeetingId,
+  },
+  {
+    id: "task-002",
+    title: "Revise dashboard hierarchy for next meeting action",
+    owner: "Linh Tran",
+    deadline: "Apr 30, 2026",
+    status: "pending",
+    sourceTimestamp: "04:03",
+    meetingId: fullMeetingId,
+  },
+  {
+    id: "task-003",
+    title: "Update AI suggestion and confirmed decision visual rules",
+    owner: "Linh Tran",
+    deadline: "May 1, 2026",
+    status: "pending",
+    sourceTimestamp: "15:09",
+    meetingId: fullMeetingId,
+  },
+  {
+    id: "task-004",
+    title: "Prepare daily digest notification proposal",
+    owner: "Alex Romero",
+    deadline: "May 2, 2026",
+    status: "done",
+    sourceTimestamp: "22:06",
+    meetingId: fullMeetingId,
+  },
+  {
+    id: "task-005",
+    title: "Create sprint tickets for task extraction workstream",
+    owner: "Jordan Lee",
+    deadline: "May 3, 2026",
+    status: "in_progress",
+    sourceTimestamp: "31:18",
+    meetingId: fullMeetingId,
+  },
+  {
+    id: "task-006",
+    title: "Write beta release brief for product leadership",
+    owner: "Mina Patel",
+    deadline: "May 5, 2026",
+    status: "pending",
+    sourceTimestamp: "36:52",
+    meetingId: fullMeetingId,
+  },
+];
+
+export const fullMindmap: MindmapNode = {
+  id: "node-root",
+  label: "Q2 Product Planning",
+  type: "root",
+  children: [
+    {
+      id: "node-followups",
+      label: "Trustworthy follow-ups",
+      type: "topic",
+      children: [
+        { id: "node-owner-detection", label: "Auto-owner detection", type: "task", children: [] },
+        { id: "node-daily-digest", label: "Daily task digest", type: "decision", children: [] },
+      ],
+    },
+    {
+      id: "node-design",
+      label: "Design review",
+      type: "topic",
+      children: [
+        { id: "node-dashboard", label: "Dashboard hierarchy", type: "task", children: [] },
+        { id: "node-ai-chip", label: "AI vs confirmed states", type: "decision", children: [] },
+      ],
+    },
+    {
+      id: "node-risks",
+      label: "Release risks",
+      type: "risk",
+      children: [
+        { id: "node-fatigue", label: "Notification fatigue", type: "risk", children: [] },
+        { id: "node-confidence", label: "Low-confidence task extraction", type: "risk", children: [] },
+      ],
+    },
+  ],
+};
+
+export const aiMessages: AIMessage[] = [
+  {
+    id: "msg-001",
+    role: "user",
+    content: "What were the final Q2 beta priorities?",
+    timestampReferences: ["36:52"],
+  },
+  {
+    id: "msg-002",
+    role: "assistant",
+    content: "The final priorities were trustworthy follow-ups, summary clarity, and searchable meeting memory.",
+    timestampReferences: ["36:52", "27:41"],
+  },
+  {
+    id: "msg-003",
+    role: "user",
+    content: "Which risks should product leadership see first?",
+    timestampReferences: ["18:47"],
+  },
+  {
+    id: "msg-004",
+    role: "assistant",
+    content: "Notification fatigue is the clearest leadership-level risk. The team agreed to group AI-generated tasks into daily digests.",
+    timestampReferences: ["18:47", "22:06"],
+  },
+  {
+    id: "msg-005",
+    role: "user",
+    content: "Who owns the design follow-up?",
+    timestampReferences: ["04:03", "15:09"],
+  },
+  {
+    id: "msg-006",
+    role: "assistant",
+    content: "Linh owns dashboard hierarchy and the visual distinction between AI suggestions and confirmed decisions.",
+    timestampReferences: ["04:03", "15:09"],
+  },
+];
+
+export const fullMeeting: Meeting = {
+  id: fullMeetingId,
+  title: "Q2 Product Planning and Design Review",
+  date: "Apr 25, 2026",
+  duration: "38 min",
+  participants: 4,
+  project: "Red Renote Beta",
+  audioUrl: "https://cdn.redrenote.local/audio/q2-product-planning-design-review.mp3",
+  summary:
+    "The team finalized the Q2 beta focus around reliable follow-ups, clearer AI summary hierarchy, and searchable meeting memory. Engineering will scope owner detection conservatively while design improves decision and suggestion states.",
+  keyTakeaways: [
+    "Q2 beta should prioritize reliability over broad automation.",
+    "Auto-owner detection starts with explicit names and calendar attendees.",
+    "The dashboard needs one obvious next meeting action.",
+    "AI-generated tasks should default to daily digest notifications.",
+  ],
+  decisions: [
+    "Ship grouped daily digests for generated tasks.",
+    "Use stronger contrast only for confirmed decisions.",
+    "Limit beta owner detection to explicit names and attendees.",
+    "Create three sprint workstreams: extraction, dashboard, and transcript search.",
+  ],
+  risks: [
+    "Users may disable notifications if AI-generated tasks are too noisy.",
+    "Low-confidence owner detection could reduce trust in follow-ups.",
+    "Dashboard density could make the next action harder to find.",
+  ],
+  followUps: [
+    "Jordan to draft the auto-owner detection beta scope.",
+    "Linh to revise the dashboard hierarchy and decision state styling.",
+    "Alex to prepare a daily digest notification proposal.",
+    "Mina to write the product leadership beta brief.",
+  ],
+  transcript: fullTranscript,
+  tasks: fullTasks,
+  mindmap: fullMindmap,
+  status: "completed",
+  tags: ["Product planning", "Design review", "Sprint planning"],
+};
 
 export const meetings: Meeting[] = [
+  fullMeeting,
   {
-    id: "m-101",
-    title: "Q2 Growth Review",
-    startsAt: "Today, 10:30",
-    duration: "42 min",
-    status: "completed",
-    participants: 6,
-    summary: "Pricing, onboarding friction, and expansion accounts need follow-up.",
-    tags: ["Revenue", "Action items"],
+    ...fullMeeting,
+    id: "meeting-design-system-review",
+    title: "Design System Review",
+    date: "Apr 24, 2026",
+    duration: "31 min",
+    participants: 5,
+    project: "Red Renote Mobile",
+    summary: "Reviewed red brand states, card density, and reusable mobile components for the Expo shell.",
+    keyTakeaways: ["Keep red for primary action moments.", "Cards should stay quiet and business-focused."],
+    decisions: ["Use rounded 2xl cards across meeting surfaces.", "Avoid dense nested cards in dashboard views."],
+    risks: ["Overusing red could make AI and danger states compete."],
+    followUps: ["Document component usage rules for app teams."],
+    transcript: [],
+    tasks: [],
+    mindmap: fullMindmap,
+    tags: ["Design system", "Mobile UI"],
   },
   {
-    id: "m-102",
-    title: "Product Sync",
-    startsAt: "Yesterday",
-    duration: "28 min",
-    status: "processing",
-    participants: 4,
-    summary: "AI analysis is extracting decisions, risks, and owners.",
-    tags: ["Product", "AI analysis"],
+    ...fullMeeting,
+    id: "meeting-sprint-planning-18",
+    title: "Sprint Planning 18",
+    date: "Apr 23, 2026",
+    duration: "46 min",
+    participants: 7,
+    project: "AI Meeting Assistant",
+    summary: "Planned sprint work around transcript search, task confidence scoring, and meeting detail navigation.",
+    keyTakeaways: ["Search ranking needs timestamp relevance.", "Task confidence should be visible before assignment."],
+    decisions: ["Start with mock confidence states before backend scoring lands."],
+    risks: ["Navigation can feel fragmented if meeting tabs do not preserve context."],
+    followUps: ["Create tickets for transcript search empty states."],
+    transcript: [],
+    tasks: [],
+    mindmap: fullMindmap,
+    tags: ["Sprint", "Engineering"],
+  },
+  {
+    ...fullMeeting,
+    id: "meeting-enterprise-feedback",
+    title: "Enterprise Feedback Review",
+    date: "Apr 22, 2026",
+    duration: "52 min",
+    participants: 6,
+    project: "Customer Beta",
+    summary: "Enterprise users asked for better auditability, source timestamps, and clearer ownership in AI-generated follow-ups.",
+    keyTakeaways: ["Source timestamps are required for trust.", "Admins need export controls."],
+    decisions: ["Show source timestamps on every task card."],
+    risks: ["Missing audit context can block enterprise rollout."],
+    followUps: ["Collect export requirements from beta admins."],
+    transcript: [],
+    tasks: [],
+    mindmap: fullMindmap,
+    tags: ["Customer feedback", "Enterprise"],
+  },
+  {
+    ...fullMeeting,
+    id: "meeting-go-to-market-sync",
+    title: "Go-to-Market Sync",
+    date: "Apr 21, 2026",
+    duration: "29 min",
+    participants: 5,
+    project: "Launch Readiness",
+    summary: "Aligned launch messaging around meeting memory, manager follow-up workflows, and reduced manual note cleanup.",
+    keyTakeaways: ["Position Red Renote around meeting memory.", "Use manager workflows in launch examples."],
+    decisions: ["Lead with productivity outcomes instead of transcription accuracy."],
+    risks: ["Messaging may sound generic without concrete workflow examples."],
+    followUps: ["Draft launch examples for design review and sprint planning."],
+    transcript: [],
+    tasks: [],
+    mindmap: fullMindmap,
+    tags: ["GTM", "Launch"],
   },
 ];
+
+export const recentMeetings = meetings.slice(0, 5);
+export const tasks = fullTasks;
+export const transcriptSegments = fullTranscript;
+export const mindmap = fullMindmap;
 
 export const insights: Insight[] = [
-  { id: "i-1", label: "Meetings", value: "12", tone: "neutral" },
-  { id: "i-2", label: "Tasks", value: "18", tone: "red" },
-  { id: "i-3", label: "Saved", value: "6h", tone: "success" },
-];
-
-export const tasks: MeetingTask[] = [
-  {
-    id: "t-1",
-    title: "Send revised onboarding metrics",
-    owner: "Mina",
-    deadline: "Today",
-    status: "in_progress",
-    sourceTimestamp: "18:42",
-  },
-  {
-    id: "t-2",
-    title: "Confirm enterprise pricing experiment",
-    owner: "Alex",
-    deadline: "Fri",
-    status: "todo",
-    sourceTimestamp: "31:08",
-  },
-];
-
-export const transcriptSegments: TranscriptSegment[] = [
-  {
-    id: "tr-1",
-    speaker: "Linh",
-    timestamp: "12:04",
-    text: "The renewal risk is concentrated in accounts that did not complete onboarding in the first two weeks.",
-    highlighted: true,
-  },
-  {
-    id: "tr-2",
-    speaker: "Alex",
-    timestamp: "13:19",
-    text: "Let us separate enablement follow-up from the pricing experiment so the owners stay clear.",
-  },
+  { id: "i-1", label: "Meetings", value: "5", tone: "neutral" },
+  { id: "i-2", label: "Tasks", value: "6", tone: "red" },
+  { id: "i-3", label: "Saved", value: "8h", tone: "success" },
 ];

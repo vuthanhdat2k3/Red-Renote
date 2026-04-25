@@ -54,7 +54,7 @@ export function MeetingCard({ title, date, duration, participants, summaryPrevie
 export function MeetingCardFromMeeting({ meeting }: { meeting: Meeting }) {
   return (
     <MeetingCard
-      date={meeting.startsAt}
+      date={meeting.date}
       duration={meeting.duration}
       participants={meeting.participants}
       status={meeting.status}

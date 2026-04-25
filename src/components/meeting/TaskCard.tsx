@@ -3,30 +3,27 @@ import { Text, View } from "react-native";
 
 import { AppCard } from "@/components/ui/Card";
 import { colors } from "@/constants/tokens";
-import type { MeetingTask, MeetingTaskStatus } from "@/types/meeting";
+import type { Task, TaskStatus } from "@/types/meeting";
 import { cn } from "@/lib/cn";
 
-export type TaskCardProps = MeetingTask;
+export type TaskCardProps = Task;
 
-const statusLabel: Record<MeetingTaskStatus, string> = {
-  todo: "To do",
+const statusLabel: Record<TaskStatus, string> = {
+  pending: "Pending",
   in_progress: "In progress",
   done: "Done",
-  blocked: "Blocked",
 };
 
-const statusContainerClass: Record<MeetingTaskStatus, string> = {
-  todo: "bg-app-background",
+const statusContainerClass: Record<TaskStatus, string> = {
+  pending: "bg-app-background",
   in_progress: "bg-red-50",
   done: "bg-emerald-50",
-  blocked: "bg-amber-50",
 };
 
-const statusTextClass: Record<MeetingTaskStatus, string> = {
-  todo: "text-app-muted",
+const statusTextClass: Record<TaskStatus, string> = {
+  pending: "text-app-muted",
   in_progress: "text-brand-primary",
   done: "text-emerald-700",
-  blocked: "text-amber-700",
 };
 
 export function TaskCard({ title, owner, deadline, status, sourceTimestamp }: TaskCardProps) {

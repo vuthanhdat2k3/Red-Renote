@@ -8,6 +8,7 @@ import { AIChip } from "@/components/ui/AIChip";
 import { AppButton } from "@/components/ui/Button";
 import { AppCard } from "@/components/ui/Card";
 import { AppScreen } from "@/components/ui/AppScreen";
+import { aiMessages } from "@/data/mock";
 
 export default function MeetingChatRoute() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -22,12 +23,15 @@ export default function MeetingChatRoute() {
         <AIChip label="Open risks" />
         <AIChip label="Next steps" />
       </View>
-      <AppCard className="gap-2">
-        <Text className="text-xs font-semibold uppercase tracking-[1px] text-brand-primary">AI assistant</Text>
-        <Text className="text-[15px] leading-6 text-app-text">
-          The highest priority follow-up is onboarding risk for renewal accounts. Start with owners assigned in the tasks tab.
-        </Text>
-      </AppCard>
+      {aiMessages.map((message) => (
+        <AppCard className={message.role === "assistant" ? "gap-2" : "gap-2 bg-red-50"} key={message.id}>
+          <Text className="text-xs font-semibold uppercase tracking-[1px] text-brand-primary">{message.role === "assistant" ? "AI assistant" : "You"}</Text>
+          <Text className="text-[15px] leading-6 text-app-text">{message.content}</Text>
+          {message.timestampReferences.length > 0 ? (
+            <Text className="text-xs font-semibold text-app-muted">Refs: {message.timestampReferences.join(", ")}</Text>
+          ) : null}
+        </AppCard>
+      ))}
       <AppButton icon={SendHorizonal}>Send mock question</AppButton>
     </AppScreen>
   );

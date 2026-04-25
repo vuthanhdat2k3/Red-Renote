@@ -5,8 +5,19 @@ import { MeetingDetailNav } from "@/components/meeting/MeetingDetailNav";
 import { AppHeader } from "@/components/shell/AppHeader";
 import { AppCard } from "@/components/ui/Card";
 import { AppScreen } from "@/components/ui/AppScreen";
+import { mindmap } from "@/data/mock";
+import type { MindmapNode } from "@/types/meeting";
 
-const nodes = ["Growth", "Onboarding", "Pricing", "Renewals", "Tasks"];
+function renderNode(node: MindmapNode, level = 0) {
+  return (
+    <View className="gap-2" key={node.id} style={{ marginLeft: level * 14 }}>
+      <View className={level === 0 ? "rounded-full bg-brand-primary px-5 py-3" : "rounded-2xl border border-app-border bg-red-50 px-4 py-3"}>
+        <Text className={level === 0 ? "text-center text-base font-bold text-white" : "text-sm font-semibold text-brand-primary"}>{node.label}</Text>
+      </View>
+      {node.children.map((child) => renderNode(child, level + 1))}
+    </View>
+  );
+}
 
 export default function MeetingMindmapRoute() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -16,17 +27,8 @@ export default function MeetingMindmapRoute() {
     <AppScreen contentClassName="gap-5">
       <AppHeader showBackButton onBackPress={() => router.back()} title="Mindmap" subtitle={meetingId} />
       <MeetingDetailNav activeTab="mindmap" meetingId={meetingId} />
-      <AppCard className="items-center gap-5 py-8">
-        <View className="h-24 w-24 items-center justify-center rounded-full bg-brand-primary">
-          <Text className="text-center text-base font-bold text-white">Q2 Review</Text>
-        </View>
-        <View className="flex-row flex-wrap justify-center gap-3">
-          {nodes.map((node) => (
-            <View className="rounded-full border border-app-border bg-red-50 px-4 py-2" key={node}>
-              <Text className="text-sm font-semibold text-brand-primary">{node}</Text>
-            </View>
-          ))}
-        </View>
+      <AppCard className="gap-3 py-5">
+        {renderNode(mindmap)}
       </AppCard>
     </AppScreen>
   );
