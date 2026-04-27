@@ -247,7 +247,7 @@ export const fullMeeting: Meeting = {
   duration: "38 min",
   participants: 4,
   project: "Red Renote Beta",
-  audioUrl: "https://cdn.redrenote.local/audio/q2-product-planning-design-review.mp3",
+  audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
   summary:
     "The team finalized the Q2 beta focus around reliable follow-ups, clearer AI summary hierarchy, and searchable meeting memory. Engineering will scope owner detection conservatively while design improves decision and suggestion states.",
   keyTakeaways: [
