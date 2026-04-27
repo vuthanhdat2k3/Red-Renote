@@ -1,5 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { aiMessages as seedAiMessages, meetings as seedMeetings } from "@/data/mock";
+import {
+  askMeetingQuestion,
+  createMeetingFromAudio,
+  getMeetingDetailFromApi,
+  isMeetingApiConfigured,
+  regenerateMeeting,
+  waitForMeetingAnalysis,
+} from "@/lib/meeting-api";
 import { supabase } from "@/lib/supabase";
 import type { AIMessage, Meeting, MindmapNode, Task, TranscriptItem, User } from "@/types/meeting";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -17,6 +25,7 @@ type SavedMeetingBundle = {
 };
 
 const SAVED_MEETINGS_STORAGE_KEY = "red-renote:saved-meetings";
+const LOCAL_BACKEND_OWNER_USER_ID = "00000000-0000-0000-0000-000000000000";
 
 let savedMeetingBundlesCache: SavedMeetingBundle[] | null = null;
 
@@ -175,6 +184,16 @@ async function getAuthenticatedUser(client: SupabaseClient): Promise<User> {
     avatarUrl,
     plan,
   };
+}
+
+async function getBackendOwnerUserId(): Promise<string> {
+  try {
+    const client = getSupabaseClient();
+    const { data } = await client.auth.getUser();
+    return data.user?.id ?? LOCAL_BACKEND_OWNER_USER_ID;
+  } catch {
+    return LOCAL_BACKEND_OWNER_USER_ID;
+  }
 }
 
 function mergeById<T extends { id: string }>(primary: T[], secondary: T[]): T[] {
@@ -484,6 +503,56 @@ export async function saveMockProcessedMeeting(params: {
   return bundle.meeting;
 }
 
+export async function saveProcessedMeeting(params: {
+  recordingId: string;
+  recordingUri: string | null;
+  durationMillis: number;
+}): Promise<Meeting> {
+  if (!isMeetingApiConfigured) {
+    throw new Error("Meeting API is not configured. Set EXPO_PUBLIC_MEETING_API_URL.");
+  }
+
+  if (!params.recordingUri) {
+    throw new Error("Recording file URI is missing. Stop the recorder again before upload.");
+  }
+
+  const ownerUserId = await getBackendOwnerUserId();
+  const createdAt = new Date();
+  const title = `Recorded Meeting ${new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(createdAt)}`;
+  const createResult = await createMeetingFromAudio({
+    fileUri: params.recordingUri,
+    fileName: `${params.recordingId}.m4a`,
+    mimeType: "audio/mp4",
+    title,
+    ownerUserId,
+    project: "Recorded Meetings",
+    participants: 1,
+    tags: ["Recorded", "Transcript"],
+    audioUrl: params.recordingUri,
+    runAnalysis: false,
+  });
+  const bundle = await getMeetingDetailFromApi(createResult.meeting.id);
+
+  await addSavedMeetingBundle(bundle);
+  return bundle.meeting;
+}
+
+export async function analyzeMeetingSummary(meetingId: string, lang?: string): Promise<Meeting> {
+  if (!isMeetingApiConfigured) {
+    throw new Error("Meeting API is not configured. Set EXPO_PUBLIC_MEETING_API_URL.");
+  }
+
+  await regenerateMeeting(meetingId, lang);
+  const bundle = await waitForMeetingAnalysis(meetingId);
+  await addSavedMeetingBundle(bundle);
+  return bundle.meeting;
+}
+
 export async function getDashboardData(): Promise<DashboardData> {
   const localMeetings = await getLocalMeetings();
 
@@ -539,6 +608,16 @@ export async function getMeeting(meetingId: string): Promise<Meeting> {
     return localBundle.meeting;
   }
 
+  if (isMeetingApiConfigured) {
+    try {
+      const bundle = await getMeetingDetailFromApi(meetingId);
+      await addSavedMeetingBundle(bundle);
+      return bundle.meeting;
+    } catch {
+      // Fall through to Supabase for older records or when the local API is offline.
+    }
+  }
+
   const client = getSupabaseClient();
 
   const [{ data: meetingRow, error: meetingError }, tasks, transcript] = await Promise.all([
@@ -559,6 +638,16 @@ export async function getMeetingTasks(meetingId?: string): Promise<Task[]> {
     const localBundle = await getLocalMeetingBundle(meetingId);
     if (localBundle) {
       return localBundle.meeting.tasks;
+    }
+
+    if (isMeetingApiConfigured) {
+      try {
+        const bundle = await getMeetingDetailFromApi(meetingId);
+        await addSavedMeetingBundle(bundle);
+        return bundle.meeting.tasks;
+      } catch {
+        // Fall through to Supabase.
+      }
     }
   } else {
     const localMeetings = await getLocalMeetings();
@@ -588,6 +677,16 @@ export async function getTranscript(meetingId: string): Promise<TranscriptItem[]
     return localBundle.meeting.transcript;
   }
 
+  if (isMeetingApiConfigured) {
+    try {
+      const bundle = await getMeetingDetailFromApi(meetingId);
+      await addSavedMeetingBundle(bundle);
+      return bundle.meeting.transcript;
+    } catch {
+      // Fall through to Supabase.
+    }
+  }
+
   const client = getSupabaseClient();
 
   const { data, error } = await client
@@ -609,6 +708,16 @@ export async function getAIChatMessages(meetingId: string): Promise<AIMessage[]>
     return localBundle.aiMessages;
   }
 
+  if (isMeetingApiConfigured) {
+    try {
+      const bundle = await getMeetingDetailFromApi(meetingId);
+      await addSavedMeetingBundle(bundle);
+      return bundle.aiMessages;
+    } catch {
+      // Fall through to Supabase.
+    }
+  }
+
   const client = getSupabaseClient();
 
   const { data, error } = await client
@@ -622,4 +731,46 @@ export async function getAIChatMessages(meetingId: string): Promise<AIMessage[]>
   }
 
   return (data as AIMessageRow[]).map(rowToAIMessage);
+}
+
+export async function sendMeetingQuestion(meetingId: string, question: string): Promise<AIMessage[]> {
+  const trimmedQuestion = question.trim();
+  if (!trimmedQuestion) {
+    return getAIChatMessages(meetingId);
+  }
+
+  if (isMeetingApiConfigured) {
+    try {
+      const ownerUserId = await getBackendOwnerUserId();
+      await askMeetingQuestion({ meetingId, ownerUserId, question: trimmedQuestion });
+      const bundle = await getMeetingDetailFromApi(meetingId);
+      await addSavedMeetingBundle(bundle);
+      return bundle.aiMessages;
+    } catch {
+      // Seed/local meetings do not exist in the backend; keep demo chat usable.
+    }
+  }
+
+  const localBundle = await getLocalMeetingBundle(meetingId);
+  if (!localBundle) {
+    throw new Error("Meeting API is not configured and this meeting is not available locally.");
+  }
+
+  const fallbackMessages: AIMessage[] = [
+    ...localBundle.aiMessages,
+    {
+      id: `msg-${Date.now()}-user`,
+      role: "user",
+      content: trimmedQuestion,
+      timestampReferences: [],
+    },
+    {
+      id: `msg-${Date.now()}-assistant`,
+      role: "assistant",
+      content: "The Meeting API is not configured, so live AI chat is unavailable for this local meeting.",
+      timestampReferences: [],
+    },
+  ];
+  await addSavedMeetingBundle({ meeting: localBundle.meeting, aiMessages: fallbackMessages });
+  return fallbackMessages;
 }
