@@ -10,3 +10,4 @@ export * from "./SearchBar";
 export * from "./SectionHeader";
 export * from "./SectionTitle";
 export * from "./StatPill";
+export * from "./LanguageSelector";
