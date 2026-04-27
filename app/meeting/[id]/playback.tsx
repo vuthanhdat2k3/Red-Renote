@@ -1,4 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
+import { useTranslation } from "react-i18next";
 
 import { MeetingDetailNav } from "@/components/meeting/MeetingDetailNav";
 import { MeetingHomeAction } from "@/components/meeting/MeetingHomeAction";
@@ -8,19 +9,14 @@ import { AppScreen } from "@/components/ui/AppScreen";
 import { useMeeting } from "@/hooks/useMeetingData";
 
 export default function MeetingPlaybackRoute() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const meetingId = id ?? "meeting-demo";
   const meeting = useMeeting(meetingId);
 
   return (
     <AppScreen contentClassName="gap-6">
-      <AppHeader
-        showBackButton
-        onBackPress={() => router.back()}
-        rightAction={<MeetingHomeAction />}
-        title="Playback"
-        subtitle={meeting.title || meetingId}
-      />
+      <AppHeader showBackButton onBackPress={() => router.back()} rightAction={<MeetingHomeAction />} title={t("meeting.playback")} subtitle={meeting.title || meetingId} />
       <MeetingDetailNav activeTab="playback" meetingId={meetingId} />
       <MeetingPlaybackCard audioUrl={meeting.audioUrl} />
     </AppScreen>

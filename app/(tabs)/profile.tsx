@@ -2,22 +2,28 @@ import { router, type Href } from "expo-router";
 import { LogOut, Settings, ShieldCheck, UserRound } from "lucide-react-native";
 import { useState } from "react";
 import { Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { AppScreen } from "@/components/ui/AppScreen";
 import { AppButton } from "@/components/ui/Button";
+import { LanguageSelector } from "@/components/ui/LanguageSelector";
 import { PressableScale } from "@/components/ui/PressableScale";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { colors } from "@/constants/tokens";
 import { useDashboardData } from "@/hooks/useMeetingData";
 import { useAuthStore } from "@/store/auth-store";
+import { useAppStore } from "@/store/app-store";
 import { cn } from "@/lib/cn";
 
 export default function ProfileRoute() {
+  const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
   const signOut = useAuthStore((state) => state.signOut);
   const { meetings } = useDashboardData();
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const appLanguage = useAppStore((s) => s.appLanguage);
+  const setAppLanguage = useAppStore((s) => s.setAppLanguage);
   const fullName =
     typeof user?.user_metadata?.full_name === "string" && user.user_metadata.full_name.trim()
       ? user.user_metadata.full_name
@@ -70,25 +76,28 @@ export default function ProfileRoute() {
         <View className="flex-row gap-3">
           <View className="flex-1 bg-white rounded-2xl p-4 border border-app-border shadow-sm">
             <Text className="text-[20px] font-extrabold text-app-text">{meetings.length}</Text>
-            <Text className="text-[11px] font-bold text-app-muted uppercase tracking-widest mt-1">Sessions</Text>
+            <Text className="text-[11px] font-bold text-app-muted uppercase tracking-widest mt-1">{t("profile.sessions")}</Text>
           </View>
           <View className="flex-1 bg-white rounded-2xl p-4 border border-app-border shadow-sm">
             <Text className="text-[20px] font-extrabold text-app-text">Business</Text>
-            <Text className="text-[11px] font-bold text-app-muted uppercase tracking-widest mt-1">Plan</Text>
+            <Text className="text-[11px] font-bold text-app-muted uppercase tracking-widest mt-1">{t("profile.plan")}</Text>
           </View>
         </View>
       </View>
 
       <View className="px-6 gap-4 pb-10">
-        <SectionTitle title="Account Security" />
+        <SectionTitle title={t("profile.app_language")} />
+        <LanguageSelector value={appLanguage} onChange={setAppLanguage} />
+
+        <SectionTitle title={t("profile.account_security")} />
         <View className="gap-3">
           <View className="flex-row items-center gap-4 p-4 rounded-3xl bg-white border border-app-border shadow-sm">
             <View className={cn("h-10 w-10 items-center justify-center rounded-2xl", emailConfirmed ? "bg-emerald-50" : "bg-amber-50")}>
               <ShieldCheck color={emailConfirmed ? colors.success : colors.warning} size={20} strokeWidth={2.5} />
             </View>
             <View className="flex-1">
-              <Text className="text-[15px] font-bold text-app-text">{emailConfirmed ? "Verified Account" : "Verify Email"}</Text>
-              <Text className="text-[13px] text-app-muted">{emailConfirmed ? "Secure and synced" : "Action required"}</Text>
+              <Text className="text-[15px] font-bold text-app-text">{emailConfirmed ? t("profile.verified") : t("profile.verify_email")}</Text>
+              <Text className="text-[13px] text-app-muted">{emailConfirmed ? t("profile.secure_synced") : t("profile.action_required")}</Text>
             </View>
           </View>
         </View>
@@ -109,7 +118,7 @@ export default function ProfileRoute() {
             className="border-red-100 bg-red-50/50"
             textClassName="text-brand-primary"
           >
-            Log Out from Session
+            {t("profile.sign_out")}
           </AppButton>
         </View>
       </View>

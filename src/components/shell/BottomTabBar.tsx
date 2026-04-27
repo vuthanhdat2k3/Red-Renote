@@ -1,6 +1,7 @@
 import { Mic } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 
 import { colors, shadows } from "@/constants/tokens";
 import { tabRoutes } from "@/constants/routes";
@@ -19,6 +20,7 @@ export type BottomTabBarProps = {
 };
 
 export function BottomTabBar({ state, navigation }: BottomTabBarProps) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   return (
@@ -40,7 +42,7 @@ export function BottomTabBar({ state, navigation }: BottomTabBarProps) {
             return (
               <View key="record-placeholder" className="flex-1 items-center justify-center">
                 <View className="h-9 w-12" />
-                <Text className="text-[10px] font-bold text-brand-primary mt-1 opacity-0">{route.title}</Text>
+                <Text className="text-[10px] font-bold text-brand-primary mt-1 opacity-0">{t(route.titleKey)}</Text>
               </View>
             );
           }
@@ -48,7 +50,7 @@ export function BottomTabBar({ state, navigation }: BottomTabBarProps) {
           return (
             <Pressable
               key={route.name}
-              accessibilityLabel={route.title}
+              accessibilityLabel={t(route.titleKey)}
               accessibilityRole="tab"
               accessibilityState={isFocused ? { selected: true } : undefined}
               className="flex-1 items-center justify-center gap-1"
@@ -65,14 +67,10 @@ export function BottomTabBar({ state, navigation }: BottomTabBarProps) {
               }}
             >
               <View className={cn("h-9 w-12 items-center justify-center rounded-2xl", isFocused && "bg-red-50/50")}>
-                <Icon
-                  color={isFocused ? colors.primary : colors.secondaryText}
-                  size={22}
-                  strokeWidth={2.5}
-                />
+                <Icon color={isFocused ? colors.primary : colors.secondaryText} size={22} strokeWidth={2.5} />
               </View>
               <Text className={cn("text-[10px] font-bold tracking-tight", isFocused ? "text-brand-primary" : "text-app-muted")}>
-                {route.title}
+                {t(route.titleKey)}
               </Text>
             </Pressable>
           );
@@ -98,7 +96,7 @@ export function BottomTabBar({ state, navigation }: BottomTabBarProps) {
             >
               <Mic color="white" size={28} strokeWidth={2.5} />
             </View>
-            <Text className="text-[10px] font-bold text-brand-primary">Record</Text>
+            <Text className="text-[10px] font-bold text-brand-primary">{t("record.title")}</Text>
           </View>
         </PressableScale>
       </View>

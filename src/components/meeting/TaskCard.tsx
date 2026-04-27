@@ -1,5 +1,6 @@
 import { CalendarClock, CheckCircle2, Clock3, Circle, Timer, UserRound } from "lucide-react-native";
 import { Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { AppCard } from "@/components/ui/Card";
 import { colors } from "@/constants/tokens";
@@ -7,12 +8,6 @@ import type { Task, TaskStatus } from "@/types/meeting";
 import { cn } from "@/lib/cn";
 
 export type TaskCardProps = Task;
-
-const statusLabel: Record<TaskStatus, string> = {
-  pending: "Pending",
-  in_progress: "In progress",
-  done: "Done",
-};
 
 const statusContainerClass: Record<TaskStatus, string> = {
   pending: "bg-app-background",
@@ -33,7 +28,14 @@ const statusIconColor: Record<TaskStatus, string> = {
 };
 
 export function TaskCard({ title, owner, deadline, status, sourceTimestamp }: TaskCardProps) {
+  const { t } = useTranslation();
   const StatusIcon = status === "done" ? CheckCircle2 : status === "in_progress" ? Timer : Circle;
+
+  const statusLabel: Record<TaskStatus, string> = {
+    pending: t("tasks.pending"),
+    in_progress: t("tasks.in_progress"),
+    done: t("tasks.done"),
+  };
 
   return (
     <AppCard className="gap-4">
@@ -59,7 +61,7 @@ export function TaskCard({ title, owner, deadline, status, sourceTimestamp }: Ta
         </View>
         <View className="flex-row items-center gap-2">
           <Clock3 color={colors.primary} size={15} />
-          <Text className="text-sm font-semibold text-brand-primary">From {sourceTimestamp}</Text>
+          <Text className="text-sm font-semibold text-brand-primary">{t("tasks.from")} {sourceTimestamp}</Text>
         </View>
       </View>
     </AppCard>

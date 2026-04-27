@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import { Bell, BrainCircuit, CalendarDays, CheckCircle2, Mic, Sparkles } from "lucide-react-native";
 import { useDeferredValue, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { DashboardMeetingCard } from "@/components/home/DashboardMeetingCard";
 import { DashboardTaskRow } from "@/components/home/DashboardTaskRow";
@@ -21,18 +22,11 @@ import type { Meeting } from "@/types/meeting";
 
 const folderAccents = ["#E50914", "#005AAB", "#147A4D", "#B45309"];
 
-function getGreeting() {
+function getGreeting(t: (key: string) => string) {
   const hour = new Date().getHours();
-
-  if (hour < 12) {
-    return "Good morning";
-  }
-
-  if (hour < 18) {
-    return "Good afternoon";
-  }
-
-  return "Good evening";
+  if (hour < 12) return t("home.greeting_morning");
+  if (hour < 18) return t("home.greeting_afternoon");
+  return t("home.greeting_evening");
 }
 
 function getTodayLabel() {
@@ -77,6 +71,7 @@ function getTaskSummary(tasks: ReturnType<typeof useDashboardData>["tasks"]) {
 }
 
 export default function HomeRoute() {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const { currentUser, meetings, tasks, featuredMeeting } = useDashboardData();
@@ -118,10 +113,10 @@ export default function HomeRoute() {
 
         <View className="gap-2">
           <Text className="text-[34px] font-extrabold tracking-tight text-app-text leading-[40px]">
-            {getGreeting()}, <Text className="text-brand-primary">{currentUser.name.split(" ")[0]}</Text>
+            {getGreeting(t)}, <Text className="text-brand-primary">{currentUser.name.split(" ")[0]}</Text>
           </Text>
           <Text className="text-[15px] leading-6 text-app-muted font-medium max-w-[85%]">
-            You have <Text className="text-brand-primary font-bold">{taskSummary.pending}</Text> follow-ups to review today.
+            You have <Text className="text-brand-primary font-bold">{taskSummary.pending}</Text> {t("home.follow_ups")}
           </Text>
         </View>
 
@@ -137,7 +132,7 @@ export default function HomeRoute() {
               </View>
               <Text className="text-[24px] font-extrabold tracking-tight text-app-text">{visibleMeetings.length}</Text>
             </View>
-            <Text className="text-[13px] font-bold text-app-muted uppercase tracking-wider">Insights</Text>
+            <Text className="text-[13px] font-bold text-app-muted uppercase tracking-wider">{t("home.insights")}</Text>
           </PressableScale>
 
           <PressableScale 
@@ -151,7 +146,7 @@ export default function HomeRoute() {
               </View>
               <Text className="text-[24px] font-extrabold tracking-tight text-app-text">{taskSummary.pending}</Text>
             </View>
-            <Text className="text-[13px] font-bold text-app-muted uppercase tracking-wider">Tasks</Text>
+            <Text className="text-[13px] font-bold text-app-muted uppercase tracking-wider">{t("home.tasks")}</Text>
           </PressableScale>
           
           <PressableScale 
@@ -164,13 +159,13 @@ export default function HomeRoute() {
               </View>
               <Text className="text-[24px] font-extrabold tracking-tight text-app-text">{taskSummary.inProgress}</Text>
             </View>
-            <Text className="text-[13px] font-bold text-app-muted uppercase tracking-wider">Active</Text>
+            <Text className="text-[13px] font-bold text-app-muted uppercase tracking-wider">{t("home.active")}</Text>
           </PressableScale>
         </View>
 
         <SearchBar
           onChangeText={setQuery}
-          placeholder="Ask about meetings, decisions..."
+          placeholder={t("home.search_placeholder")}
           value={query}
           onFilterPress={() => {}}
           variant="ai"
@@ -181,7 +176,7 @@ export default function HomeRoute() {
         <StartRecordingCard onPress={handleStartRecording} />
       </View>
 
-      <HomeSection action={`${visibleMeetings.length} shown`} title="Recent Meetings">
+      <HomeSection action={`${visibleMeetings.length} ${t("home.shown")}`} title={t("home.recent_meetings")}>
         {visibleMeetings.length > 0 ? (
           <ScrollView
             horizontal
@@ -201,16 +196,16 @@ export default function HomeRoute() {
         ) : (
           <AppCard className="gap-2" padding="lg">
             <Text className="text-[15px] font-bold" style={{ color: colors.text }}>
-              No meetings match this search
+              {t("home.no_meetings_title")}
             </Text>
             <Text className="text-[13px] leading-5" style={{ color: colors.secondaryText }}>
-              Try another title, date, project name, or tag.
+              {t("home.no_meetings_desc")}
             </Text>
           </AppCard>
         )}
       </HomeSection>
 
-      <HomeSection action={`${actionItems.length} pending`} title="Today&apos;s Action Items">
+      <HomeSection action={`${actionItems.length} ${t("home.pending")}`} title={t("home.action_items")}>
         <AppCard className="gap-3 bg-[#FCFCFC]" padding="sm">
           {actionItems.map((task) => (
             <DashboardTaskRow
@@ -224,10 +219,10 @@ export default function HomeRoute() {
         </AppCard>
       </HomeSection>
 
-      <HomeSection action="AI assisted" title="Suggested Follow-ups">
+      <HomeSection action={t("home.ai_assisted")} title={t("home.follow_ups_section")}>
         <AppCard className="gap-4" padding="md">
           <Text className="text-[14px] leading-6" style={{ color: colors.secondaryText }}>
-            Suggested next steps pulled from the latest meeting summary and ready for task review.
+            {t("home.follow_ups_desc")}
           </Text>
           <View className="flex-row flex-wrap gap-y-2">
             {suggestedFollowUps.map((followUp) => (
@@ -243,7 +238,7 @@ export default function HomeRoute() {
         </AppCard>
       </HomeSection>
 
-      <HomeSection title="Project Folders">
+      <HomeSection title={t("home.project_folders")}>
         <View className="flex-row gap-3">
           {projectFolders.slice(0, 2).map((folder) => (
             <ProjectFolderCard

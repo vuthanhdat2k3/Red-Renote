@@ -1,5 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { MeetingDetailNav } from "@/components/meeting/MeetingDetailNav";
 import { MeetingHomeAction } from "@/components/meeting/MeetingHomeAction";
@@ -21,23 +22,16 @@ function renderNode(node: MindmapNode, level = 0) {
 }
 
 export default function MeetingMindmapRoute() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const meetingId = id ?? "meeting-demo";
   const meeting = useMeeting(meetingId);
 
   return (
     <AppScreen contentClassName="gap-5">
-      <AppHeader
-        showBackButton
-        onBackPress={() => router.back()}
-        rightAction={<MeetingHomeAction />}
-        title="Mindmap"
-        subtitle={meetingId}
-      />
+      <AppHeader showBackButton onBackPress={() => router.back()} rightAction={<MeetingHomeAction />} title={t("meeting.mindmap")} subtitle={meetingId} />
       <MeetingDetailNav activeTab="mindmap" meetingId={meetingId} />
-      <AppCard className="gap-3 py-5">
-        {renderNode(meeting.mindmap)}
-      </AppCard>
+      <AppCard className="gap-3 py-5">{renderNode(meeting.mindmap)}</AppCard>
     </AppScreen>
   );
 }

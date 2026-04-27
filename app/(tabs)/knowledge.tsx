@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import { BookOpen, ChevronRight, Sparkles } from "lucide-react-native";
 import { useDeferredValue, useState } from "react";
 import { Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { AppScreen } from "@/components/ui/AppScreen";
 import { PressableScale } from "@/components/ui/PressableScale";
@@ -11,16 +12,13 @@ import { colors } from "@/constants/tokens";
 import { useDashboardData } from "@/hooks/useMeetingData";
 
 export default function KnowledgeRoute() {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const { meetings } = useDashboardData();
   const visibleMeetings = meetings.filter((meeting) => {
     const normalizedQuery = deferredQuery.trim().toLowerCase();
-
-    if (!normalizedQuery) {
-      return true;
-    }
-
+    if (!normalizedQuery) return true;
     return [
       meeting.title,
       meeting.project,
@@ -34,7 +32,6 @@ export default function KnowledgeRoute() {
   return (
     <AppScreen contentClassName="gap-8 pt-4">
       <View className="absolute top-0 right-0 h-64 w-64 rounded-full bg-blue-100 opacity-30 -mr-20 -mt-20 blur-3xl" />
-      
       <View className="px-6 gap-6">
         <View className="flex-row items-center justify-between">
           <View className="h-10 w-10 items-center justify-center rounded-full bg-blue-50 border border-blue-100">
@@ -44,45 +41,34 @@ export default function KnowledgeRoute() {
             <Sparkles color={colors.primary} size={18} strokeWidth={2.5} />
           </View>
         </View>
-
         <View className="gap-2">
           <Text className="text-[34px] font-extrabold tracking-tight text-app-text leading-[40px]">
-            Ask your <Text className="text-blue-600">meetings.</Text>
+            {t("knowledge.ask_meetings")}
           </Text>
           <Text className="text-[15px] leading-6 text-app-muted font-medium max-w-[90%]">
-            Search decisions, people, and context with source-backed AI memory.
+            {t("knowledge.search_context")}
           </Text>
         </View>
-
-        <SearchBar
-          onChangeText={setQuery}
-          placeholder="Ask about meetings, decisions..."
-          value={query}
-          variant="ai"
-        />
-
+        <SearchBar onChangeText={setQuery} placeholder={t("knowledge.search_placeholder")} value={query} variant="ai" />
         <View className="flex-row gap-3">
           <View className="flex-1 bg-blue-50/50 rounded-2xl p-4 border border-blue-100">
             <Text className="text-[20px] font-extrabold text-blue-700">{visibleMeetings.length}</Text>
-            <Text className="text-[11px] font-bold text-blue-600/70 uppercase tracking-widest mt-1">Results</Text>
+            <Text className="text-[11px] font-bold text-blue-600/70 uppercase tracking-widest mt-1">{t("common.results")}</Text>
           </View>
           <View className="flex-1 bg-emerald-50/50 rounded-2xl p-4 border border-emerald-100">
             <Text className="text-[20px] font-extrabold text-emerald-700">{meetings.reduce((total, m) => total + m.decisions.length, 0)}</Text>
-            <Text className="text-[11px] font-bold text-emerald-600/70 uppercase tracking-widest mt-1">Decisions</Text>
+            <Text className="text-[11px] font-bold text-emerald-600/70 uppercase tracking-widest mt-1">{t("common.decisions")}</Text>
           </View>
         </View>
       </View>
-
       <View className="gap-4 px-6 pb-10">
-        <SectionTitle title="Meeting Memory" />
+        <SectionTitle title={t("common.meeting_memory")} />
         <View className="gap-4">
           {visibleMeetings.map((meeting) => (
             <PressableScale
               key={meeting.id}
               className="gap-4 rounded-3xl border border-app-border bg-white p-5 shadow-sm"
-              onPress={() => {
-                router.push({ pathname: "/meeting/[id]/summary", params: { id: meeting.id } });
-              }}
+              onPress={() => router.push({ pathname: "/meeting/[id]/summary", params: { id: meeting.id } })}
               scaleTo={0.98}
             >
               <View className="flex-row items-start justify-between">
@@ -94,11 +80,7 @@ export default function KnowledgeRoute() {
                   <ChevronRight color={colors.secondaryText} size={16} strokeWidth={2.5} />
                 </View>
               </View>
-              
-              <Text className="text-sm leading-6 text-app-muted" numberOfLines={2}>
-                {meeting.summary}
-              </Text>
-
+              <Text className="text-sm leading-6 text-app-muted" numberOfLines={2}>{meeting.summary}</Text>
               <View className="flex-row flex-wrap gap-2">
                 {meeting.tags.slice(0, 3).map((tag) => (
                   <View key={tag} className="rounded-full bg-app-background border border-app-border px-3 py-1">

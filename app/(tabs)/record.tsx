@@ -1,13 +1,9 @@
-import {
-  RecordingPresets,
-  setAudioModeAsync,
-  useAudioRecorder,
-  useAudioRecorderState,
-} from "expo-audio";
+import { RecordingPresets, setAudioModeAsync, useAudioRecorder, useAudioRecorderState } from "expo-audio";
 import { router } from "expo-router";
 import { Bot, Pause, Play, Square, Waves } from "lucide-react-native";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Alert, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { RecordButton } from "@/components/shell/RecordButton";
 import { PulseDot, StatusPill, TopExperience, Waveform } from "@/components/shell/TopExperience";
@@ -22,17 +18,15 @@ function formatDuration(durationMillis: number) {
   const totalSeconds = Math.max(0, Math.floor(durationMillis / 1000));
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
-
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
 
 export default function RecordRoute() {
-  const [isPreparing, setIsPreparing] = useState(true);
+  const { t } = useTranslation();
+  const [isPreparing, setIsPreparing] = useState(false);
+  const [hasStartedSession, setHasStartedSession] = useState(false);
   const [recorderError, setRecorderError] = useState<string | null>(null);
-  const audioRecorder = useAudioRecorder({
-    ...RecordingPresets.HIGH_QUALITY,
-    isMeteringEnabled: true,
-  });
+  const audioRecorder = useAudioRecorder({ ...RecordingPresets.HIGH_QUALITY, isMeteringEnabled: true });
   const recorderState = useAudioRecorderState(audioRecorder, 250);
   const hasStartedRecorder = useRef(false);
   const recordingIdRef = useRef<string | null>(null);
@@ -44,79 +38,56 @@ export default function RecordRoute() {
   const finishRecording = useAppStore((state) => state.finishRecording);
 
   const startRealRecording = useCallback(async () => {
-    if (hasStartedRecorder.current) {
-      return;
-    }
-
+    if (hasStartedRecorder.current) return;
     hasStartedRecorder.current = true;
     const recordingId = activeRecordingId ?? `rec-${Date.now()}`;
     recordingIdRef.current = recordingId;
     startRecording(recordingId);
+    setHasStartedSession(true);
     setIsPreparing(true);
     setRecorderError(null);
-
     try {
       const permission = await requestMicrophonePermission();
-
-      if (!permission.granted) {
-        throw new Error(permission.message ?? "Microphone permission was denied.");
-      }
-
-      await setAudioModeAsync({
-        allowsRecording: true,
-        playsInSilentMode: true,
-      });
+      if (!permission.granted) throw new Error(permission.message ?? t("record.mic_permission_denied"));
+      await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
       await audioRecorder.prepareToRecordAsync();
       audioRecorder.record();
       resumeRecording();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to start the microphone recorder.";
+      const message = error instanceof Error ? error.message : t("record.unable_start_recorder");
       setRecorderError(message);
+      hasStartedRecorder.current = false;
+      setHasStartedSession(false);
       pauseRecording();
-      Alert.alert("Recording unavailable", message);
+      Alert.alert(t("record.recording_unavailable"), message);
     } finally {
       setIsPreparing(false);
     }
-  }, [activeRecordingId, audioRecorder, pauseRecording, resumeRecording, startRecording]);
+  }, [activeRecordingId, audioRecorder, pauseRecording, resumeRecording, startRecording, t]);
 
   const togglePause = useCallback(() => {
-    if (isPreparing || recorderError) {
-      return;
-    }
-
-    if (recorderState.isRecording) {
-      audioRecorder.pause();
-      pauseRecording();
-      return;
-    }
-
+    if (!hasStartedSession || isPreparing || recorderError) return;
+    if (recorderState.isRecording) { audioRecorder.pause(); pauseRecording(); return; }
     audioRecorder.record();
     resumeRecording();
-  }, [audioRecorder, isPreparing, pauseRecording, recorderError, recorderState.isRecording, resumeRecording]);
+  }, [audioRecorder, hasStartedSession, isPreparing, pauseRecording, recorderError, recorderState.isRecording, resumeRecording]);
 
   const stopAndAnalyze = useCallback(async () => {
+    if (!hasStartedSession) return;
     const recordingId = recordingIdRef.current ?? activeRecordingId ?? `rec-${Date.now()}`;
-
     try {
-      if (recorderState.isRecording || recorderState.canRecord) {
-        await audioRecorder.stop();
-      }
-
+      if (recorderState.isRecording || recorderState.canRecord) await audioRecorder.stop();
       const recordingUri = audioRecorder.uri ?? recorderState.url;
       finishRecording(recordingId, recordingUri, recorderState.durationMillis);
       router.push({ pathname: "/processing/[recordingId]", params: { recordingId } });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to stop and save this recording.";
+      const message = error instanceof Error ? error.message : t("record.unable_stop_save");
       setRecorderError(message);
-      Alert.alert("Could not save recording", message);
+      Alert.alert(t("record.could_not_save"), message);
     }
-  }, [activeRecordingId, audioRecorder, finishRecording, recorderState.canRecord, recorderState.durationMillis, recorderState.isRecording, recorderState.url]);
+  }, [activeRecordingId, audioRecorder, finishRecording, hasStartedSession, recorderState.canRecord, recorderState.durationMillis, recorderState.isRecording, recorderState.url, t]);
 
-  useEffect(() => {
-    void startRealRecording();
-  }, [startRealRecording]);
-
-  const statusText = isPreparing ? "Preparing microphone" : isRecording ? "Listening now" : "Recording paused";
+  const statusText = !hasStartedSession ? t("record.ready") : isPreparing ? t("record.preparing") : isRecording ? t("record.listening") : t("record.paused");
   const durationText = formatDuration(recorderState.durationMillis);
   const metering = typeof recorderState.metering === "number" ? Math.max(0.15, Math.min(1, (recorderState.metering + 60) / 60)) : 0.65;
 
@@ -134,51 +105,36 @@ export default function RecordRoute() {
               <PulseDot active={recorderState.isRecording} color={recorderState.isRecording ? "#FF5A52" : "#F59E0B"} />
               <Text className="text-[13px] font-bold text-white">{statusText}</Text>
             </View>
-            <StatusPill icon={Bot} tone="neutral">AI notes active</StatusPill>
+            <StatusPill icon={Bot} tone="neutral">{t("record.summary_on_demand")}</StatusPill>
           </View>
-
           <View className="items-center gap-3">
-            <View className="rounded-full bg-white/12 p-3">
-              <RecordButton compact />
-            </View>
+            <View className="rounded-full bg-white/12 p-3"><RecordButton compact /></View>
             <View className="items-center gap-2">
               <Text className="text-[44px] font-extrabold leading-[50px] text-white">{durationText}</Text>
-              <Text className="text-center text-[15px] leading-6 text-white/76">
-                Capturing decisions, owners, and follow-ups for analysis.
-              </Text>
+              <Text className="text-center text-[15px] leading-6 text-white/76">{t("record.save_first")}</Text>
             </View>
           </View>
-
           <Waveform active={recorderState.isRecording} metering={metering} />
         </View>
       </TopExperience>
       <LoadingStep
-        description={recorderError ?? recorderState.url ?? activeRecordingId ?? "Preparing recorder"}
-        status={recorderError ? "pending" : isPreparing ? "loading" : "done"}
-        title="Recording session"
+        description={recorderError ?? recorderState.url ?? activeRecordingId ?? t("common.press_start")}
+        status={recorderError ? "pending" : isPreparing ? "loading" : hasStartedSession ? "done" : "pending"}
+        title={t("common.recording_session")}
       />
       <View className="gap-3">
-        <AppButton
-          icon={recorderState.isRecording ? Pause : Play}
-          onPress={togglePause}
-          variant="secondary"
-        >
-          {recorderState.isRecording ? "Pause" : "Resume"}
-        </AppButton>
-        <AppButton
-          icon={Square}
-          onPress={() => {
-            void stopAndAnalyze();
-          }}
-        >
-          Stop and analyze
-        </AppButton>
+        {!hasStartedSession ? (
+          <AppButton icon={Play} loading={isPreparing} onPress={() => void startRealRecording()}>{t("record.start")}</AppButton>
+        ) : (
+          <AppButton icon={recorderState.isRecording ? Pause : Play} onPress={togglePause} variant="secondary">
+            {recorderState.isRecording ? t("record.pause") : t("record.resume")}
+          </AppButton>
+        )}
+        <AppButton disabled={!hasStartedSession || isPreparing} icon={Square} onPress={() => void stopAndAnalyze()}>{t("record.stop")}</AppButton>
       </View>
       <View className="flex-row items-center gap-3 rounded-2xl border border-app-border bg-app-surface p-4">
         <Waves color={colors.primary} size={22} strokeWidth={2.4} />
-        <Text className="flex-1 text-sm leading-5 text-app-muted">
-          Recording saves as {RecordingPresets.HIGH_QUALITY.extension} on device. Analysis upload/transcription is the next backend step.
-        </Text>
+        <Text className="flex-1 text-sm leading-5 text-app-muted">{t("record.recording_info")}</Text>
       </View>
     </AppScreen>
   );
