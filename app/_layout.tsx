@@ -22,12 +22,7 @@ export default function RootLayout() {
           <Stack.Screen name="microphone-permission" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="processing/[recordingId]" />
-          <Stack.Screen name="meeting/[id]/summary" />
-          <Stack.Screen name="meeting/[id]/playback" />
-          <Stack.Screen name="meeting/[id]/transcript" />
-          <Stack.Screen name="meeting/[id]/chat" />
-          <Stack.Screen name="meeting/[id]/mindmap" />
-          <Stack.Screen name="meeting/[id]/tasks" />
+          <Stack.Screen name="meeting/[id]" />
         </Stack>
       </AuthProvider>
     </SafeAreaProvider>

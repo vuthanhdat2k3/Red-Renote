@@ -40,20 +40,20 @@ async def root():
 @app.get("/health")
 async def health_check():
     gpu_available = False
-    gpu_memory_free = None
+    cuda_device_count = 0
     try:
-        import torch
+        import ctranslate2
 
-        gpu_available = torch.cuda.is_available()
-        if gpu_available:
-            gpu_memory_free = torch.cuda.mem_get_info()[0]
+        cuda_device_count = ctranslate2.get_cuda_device_count()
+        gpu_available = cuda_device_count > 0
     except Exception:
         pass
     return {
         "status": "healthy",
         "model_loaded": model_manager.is_loaded,
         "model_size": settings.WHISPER_MODEL_SIZE,
+        "model_device": model_manager.device,
+        "compute_type": model_manager.compute_type,
         "gpu_available": gpu_available,
-        "gpu_memory_free": gpu_memory_free,
+        "cuda_device_count": cuda_device_count,
     }
-

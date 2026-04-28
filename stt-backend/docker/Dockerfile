@@ -2,6 +2,7 @@ FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV LD_LIBRARY_PATH=/usr/local/lib/python3.12/site-packages/nvidia/cuda_runtime/lib:/usr/local/lib/python3.12/site-packages/nvidia/cublas/lib:/usr/local/lib/python3.12/site-packages/nvidia/cudnn/lib:${LD_LIBRARY_PATH}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
@@ -11,10 +12,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --retries 10 --timeout 120 --progress-bar off -r requirements.txt \
+    nvidia-cuda-runtime-cu12 \
+    nvidia-cublas-cu12 \
+    "nvidia-cudnn-cu12==9.*"
 
 COPY . .
-RUN python -c "from faster_whisper import WhisperModel; WhisperModel('tiny', device='cpu', compute_type='int8', download_root='models')"
 
 EXPOSE 8000
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

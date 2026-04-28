@@ -33,15 +33,7 @@ class WhisperModelManager:
     def _resolve_device(self, requested_device: str) -> str:
         if requested_device != "cuda":
             return requested_device
-        try:
-            import torch
-
-            if torch.cuda.is_available():
-                return "cuda"
-        except Exception:
-            logger.exception("Unable to inspect CUDA availability")
-        logger.info("CUDA unavailable, falling back to CPU")
-        return "cpu"
+        return "cuda"
 
     def load_model(
         self,
@@ -52,7 +44,7 @@ class WhisperModelManager:
         model_size = model_size or settings.WHISPER_MODEL_SIZE
         requested_device = device or settings.DEVICE
         resolved_device = self._resolve_device(requested_device)
-        compute_type = compute_type or ("float16" if resolved_device == "cuda" else "int8")
+        compute_type = compute_type or settings.COMPUTE_TYPE or ("float16" if resolved_device == "cuda" else "int8")
 
         with self._model_lock:
             if (
@@ -182,4 +174,3 @@ class WhisperModelManager:
 
 
 model_manager = WhisperModelManager()
-

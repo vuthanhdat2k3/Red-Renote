@@ -25,7 +25,6 @@ type SavedMeetingBundle = {
 };
 
 const SAVED_MEETINGS_STORAGE_KEY = "red-renote:saved-meetings";
-const LOCAL_BACKEND_OWNER_USER_ID = "00000000-0000-0000-0000-000000000000";
 
 let savedMeetingBundlesCache: SavedMeetingBundle[] | null = null;
 
@@ -187,13 +186,14 @@ async function getAuthenticatedUser(client: SupabaseClient): Promise<User> {
 }
 
 async function getBackendOwnerUserId(): Promise<string> {
-  try {
-    const client = getSupabaseClient();
-    const { data } = await client.auth.getUser();
-    return data.user?.id ?? LOCAL_BACKEND_OWNER_USER_ID;
-  } catch {
-    return LOCAL_BACKEND_OWNER_USER_ID;
+  const client = getSupabaseClient();
+  const { data, error } = await client.auth.getUser();
+
+  if (error || !data.user) {
+    throw new Error("Please sign in before uploading a recording.");
   }
+
+  return data.user.id;
 }
 
 function mergeById<T extends { id: string }>(primary: T[], secondary: T[]): T[] {
