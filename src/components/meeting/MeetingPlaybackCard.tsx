@@ -19,6 +19,10 @@ function formatPlaybackTime(valueInSeconds: number) {
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
 
+function isDisposedAudioPlayerError(error: unknown) {
+  return error instanceof Error && error.message.includes("NativeSharedObjectNotFoundException");
+}
+
 export function MeetingPlaybackCard({ audioUrl }: MeetingPlaybackCardProps) {
   const { t } = useTranslation();
   const canPlay = audioUrl.trim().length > 0;
@@ -27,15 +31,47 @@ export function MeetingPlaybackCard({ audioUrl }: MeetingPlaybackCardProps) {
   const duration = status.duration || 0;
   const progress = duration > 0 ? Math.min(1, status.currentTime / duration) : 0;
 
+  const pausePlayback = () => {
+    try {
+      player.pause();
+    } catch (error) {
+      if (!isDisposedAudioPlayerError(error)) {
+        throw error;
+      }
+    }
+  };
+
+  const startPlayback = () => {
+    try {
+      player.play();
+    } catch (error) {
+      if (!isDisposedAudioPlayerError(error)) {
+        throw error;
+      }
+    }
+  };
+
+  const seekPlayback = async (nextTime: number) => {
+    try {
+      await player.seekTo(nextTime);
+    } catch (error) {
+      if (!isDisposedAudioPlayerError(error)) {
+        throw error;
+      }
+    }
+  };
+
   useEffect(() => {
     void setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: false });
   }, []);
 
   useEffect(() => {
     return () => {
-      if (status.isLoaded && status.playing) player.pause();
+      if (status.isLoaded && status.playing) {
+        pausePlayback();
+      }
     };
-  }, [player, status.isLoaded, status.playing]);
+  }, [status.isLoaded, status.playing]);
 
   if (!canPlay) {
     return (
@@ -70,16 +106,16 @@ export function MeetingPlaybackCard({ audioUrl }: MeetingPlaybackCardProps) {
           icon={status.playing ? Pause : Play}
           onPress={() => {
             if (!status.isLoaded) return;
-            if (status.playing) { player.pause(); return; }
-            if (status.didJustFinish && duration > 0) void player.seekTo(0);
-            player.play();
+            if (status.playing) { pausePlayback(); return; }
+            if (status.didJustFinish && duration > 0) void seekPlayback(0);
+            startPlayback();
           }}
         >
           {status.playing ? t("playback.pause") : t("playback.play")}
         </AppButton>
         <AppButton
           icon={SkipBack}
-          onPress={() => { if (!status.isLoaded) return; void player.seekTo(Math.max(0, status.currentTime - 10)); }}
+          onPress={() => { if (!status.isLoaded) return; void seekPlayback(Math.max(0, status.currentTime - 10)); }}
           variant="secondary"
         >
           {t("playback.back_10s")}
@@ -88,7 +124,7 @@ export function MeetingPlaybackCard({ audioUrl }: MeetingPlaybackCardProps) {
 
       <AppButton
         icon={RotateCcw}
-        onPress={() => { if (!status.isLoaded) return; void player.seekTo(0); if (status.playing) player.pause(); }}
+        onPress={() => { if (!status.isLoaded) return; void seekPlayback(0); if (status.playing) pausePlayback(); }}
         variant="ghost"
       >
         {t("playback.restart")}
